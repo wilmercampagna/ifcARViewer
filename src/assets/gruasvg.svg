@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="249.096" y1="67.265" x2="249.096" y2="160.314" id="gradient-0" gradientTransform="matrix(0.008826, 0.999961, -2.529196, 0.022327, 554.799086, -119.379402)">
+      <stop offset="0" style="stop-color: rgba(248, 3, 113, 1)"/>
+      <stop offset="1" style="stop-color: rgba(147, 2, 67, 1)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="142.376" y1="162.442" x2="142.376" y2="343.61" id="gradient-1" gradientTransform="matrix(-0.401395, 0.915905, -0.549441, -0.240792, 328.989365, 144.985708)">
+      <stop offset="0" style="stop-color: rgba(248, 3, 113, 1)"/>
+      <stop offset="1" style="stop-color: rgba(147, 2, 67, 1)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="332.801" y1="252.803" x2="332.801" y2="344.731" id="gradient-2" gradientTransform="matrix(0.66439, 0.747386, -0.745781, 0.662964, 288.361163, -133.203216)">
+      <stop offset="0" style="stop-color: rgba(248, 3, 113, 1)"/>
+      <stop offset="1" style="stop-color: rgba(147, 2, 67, 1)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="253.364" y1="347.534" x2="253.364" y2="441.143" id="gradient-3" gradientTransform="matrix(0.355114, 0.934822, -2.168998, 0.823945, 1045.078599, -164.458651)">
+      <stop offset="0" style="stop-color: rgba(248, 3, 113, 1)"/>
+      <stop offset="1" style="stop-color: rgba(147, 2, 67, 1)"/>
+    </linearGradient>
+  </defs>
+  <path style="stroke: rgb(0, 0, 0); fill: url(#gradient-0); stroke-opacity: 0; stroke-width: 0px;" d="M 88.733 160.314 L 409.46 160.225 L 252.242 67.265 L 88.733 160.314 Z"/>
+  <path style="stroke: rgb(0, 0, 0); fill: url(#gradient-1); stroke-width: 0px;" d="M 87.444 163.677 C 87.444 163.677 197.87 161.996 197.87 162.556 C 197.87 163.116 86.883 343.61 86.883 343.61 L 87.444 163.677 Z"/>
+  <path style="stroke: rgb(0, 0, 0); fill: url(#gradient-3); stroke-width: 0px;" d="M 91.368 348.655 L 415.359 347.534 L 252.242 441.143 L 91.368 348.655 Z"/>
+  <path style="stroke: rgb(0, 0, 0); fill: url(#gradient-2); stroke-width: 0px;" d="M 251.121 343.61 L 415.602 344.731 L 250 252.803 L 251.121 343.61 Z"/>
+</svg>

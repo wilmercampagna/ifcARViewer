@@ -72,7 +72,7 @@ export default {
     <div class="relative ">
       <div class="pl-5 pr-5 w-full absolute">
         <div class="flex p-5 font-semibold justify-center text-cyan-600 hidden sm:flex">Ifc XR made for wilmercampagna
-          <img src="../assets/logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+          <img src="logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
           in collaboration with GRUA
           <img src="../assets/grua.png" alt="Logo" class="h-6  mr-2 ml-2">
         </div>

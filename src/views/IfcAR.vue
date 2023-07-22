@@ -1,5 +1,5 @@
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, render } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
@@ -11,7 +11,8 @@ import { size, camera, dolly, dummy, sceneAR } from '../helpers/configs/ARScene.
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
-import { ARButton } from '../helpers/ARButton.js';
+// import { ARButton } from '../helpers/ARButton.js';
+import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 export default {
 	name: 'IfcAR',
@@ -41,25 +42,30 @@ export default {
 			const controls = Controls(camera, renderer);
 			controls.update();
 			renderer.xr.enabled = true;
-			const arButton = new ARButton(renderer);
+			const arButton = ARButton.createButton(renderer, {
+				requiredFeatures: ['hit-test'],
+				optionalFeatures: ['dom-overlay'],
+				domOverlay: { root: document.body },
+				hitTestSource: 'local',
+				hitTestMode: 'closest',			
+			});
+			document.body.appendChild(arButton);
 
 			const onSelect = () => {
-				if (dummy.visible) {
-					dummy.visible = false;
-				} else {
-					dummy.visible = true;
-					dummy.position.setFromMatrixPosition(dolly.matrix);
-					dummy.scale.set(0.01, 0.01, 0.01);
-					dummy.updateMatrixWorld(true);
-				}
+				console.log("select")
 			};
 
 			const controller = renderer.xr.getController(0);
 			controller.addEventListener('select', onSelect);
 			sceneAR.add(controller);
+
 			function animate() {
 				// requestAnimationFrame(animate);
-				renderer.setAnimationLoop(animate);
+				renderer.setAnimationLoop(render);
+				// renderer.render(sceneAR, camera);
+			}
+
+			function render() {
 				renderer.render(sceneAR, camera);
 			}
 			animate();

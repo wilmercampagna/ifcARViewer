@@ -21,7 +21,7 @@
 				<div class="flex p-5 font-semibold justify-center text-cyan-600 flex-col sm:flex">
 					<p class="row">
 						El módulo Ifc XR creado por wilmercampagna
-						<img src="logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+						<img src="../assets/logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
 					</p>
 					<p class="row">
 						en colaboración con el grupo de investigación GRUA

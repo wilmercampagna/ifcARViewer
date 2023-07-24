@@ -2,15 +2,18 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
-  MeshLambertMaterial,
+  MeshBasicMaterial,
   Mesh,
   WebGLRenderer,
+  BoxGeometry,
 } from 'three';
 import { size, camera, cameraDolly, dummyCam } from '../helpers/Camera.js';
 import { scene } from '../helpers/configs/Scene.js';
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import { JoyStick } from '../helpers/Toon3D.js';
+import { MousePick } from '../helpers/MousePicker.js';
+import Materials from '../helpers/Materials.js';
 
 export default {
   name: 'IfcGame',
@@ -22,12 +25,15 @@ export default {
     const ifcModels = [];
     setupIfcLoader(ifcLoader);
 
-    const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
+    const materials = new Materials();
+    const lambMaterial = new MeshBasicMaterial({ transparent: true, opacity: 0.1, color: '#8050D7' });
 
     const loadIfcFile = async (change) => {
       const ifcURL = URL.createObjectURL(change.target.files[0]);
       const ifcModel = await ifcLoader.loadAsync(ifcURL);
       const modelCopy = new Mesh(ifcModel.geometry, lambMaterial);
+      ifcModel.material.push(materials.bricksWallMaterial);
+      ifcModel.mesh.geometry.groups[0].materialIndex = 4;
       ifcModels.push(ifcModel);
       scene.add(modelCopy)
       scene.add(ifcModel)
@@ -42,9 +48,25 @@ export default {
         },
       });
 
+     
+      const cubeGeometry = new BoxGeometry(1, 1, 1);
+      const cube = new Mesh(cubeGeometry, materials.whiteCeramicFloorMaterial);
+      cube.position.set(0, 1, 0);
+      // scene.add(cube);
+
+      cube.material = materials.bricksWallMaterial;
+
+      
+
       // Config the renderer      
       const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
       renderer.setSize(size.width, size.height);
+
+      const outputId = document.getElementById('id-output');
+			const outputDesc = document.getElementById('desc-output');
+			const mousePicker = new MousePick(canvas.value, camera, ifcModels,
+				ifcLoader, outputId, outputDesc)
+			canvas.value.ondblclick = mousePicker;
 
       function animate() {
         requestAnimationFrame(animate);

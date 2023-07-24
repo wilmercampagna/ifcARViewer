@@ -11,21 +11,12 @@ const size = cam.size;
 
 //Creates the camera (point of view of the user)
 const camera = cam.camera;
-//Create a 3D object to carry the camera around XR session
-const dolly = cam.cameraDolly;
-//Add dummy camera to accurately get camera orientation in handleMovement function
-const dummy = cam.dummyCam;
 //Create a scene to add the camera and other objects to
 const sceneAR = new Scene();
 // Add camera, grid, axes and lights to the scene
-camera.position.set(0, 1.6, 0);
-dolly.position.set(0, 0, 10);
-dolly.add(camera);
-camera.add(dummy);
-sceneAR.add(dolly);
+camera.position.set(10, 1.5, 20);
+sceneAR.add(camera);
 sceneAR.add(lights.ambient);
-sceneAR.add(ax.grid);
 sceneAR.add(ax.axes);
-// scene.background = new Color('#e2edfb');
 
-export { size, camera, dolly, dummy, sceneAR };;
+export { size, camera, sceneAR };;

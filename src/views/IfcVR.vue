@@ -15,7 +15,6 @@ import {
 	Quaternion
 } from 'three';
 import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.js';
-// import scene from '../helpers/configs/Scene.js';
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
@@ -52,6 +51,7 @@ export default {
 			const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 			renderer.setSize(size.width, size.height);
 			const controls = Controls(camera, renderer);
+			controls.enableDamping = true;
 			controls.update();
 
 			// Config the mouse picker
@@ -76,7 +76,8 @@ export default {
 			const clock = new Clock();
 			const render = () => {
 				const dt = clock.getDelta();
-				if (controller1) { handleUserMovement(dt) }
+				if (controller1) { handleUserMovement(dt) }				
+				controls.update();
 				renderer.render(sceneVR, camera);
 			}
 			animate();

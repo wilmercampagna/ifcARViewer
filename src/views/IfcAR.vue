@@ -1,17 +1,15 @@
 <script>
-import { ref, onMounted, onBeforeUnmount, render } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
 	Mesh,
 	WebGLRenderer,
 } from 'three';
-import { size, camera, dolly, dummy, sceneAR } from '../helpers/configs/ARScene.js';
-// import scene from '../helpers/configs/Scene.js';
+import { size, camera, sceneAR } from '../helpers/configs/ARScene.js';
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
-// import { ARButton } from '../helpers/ARButton.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 export default {

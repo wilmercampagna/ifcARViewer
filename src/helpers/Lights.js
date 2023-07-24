@@ -4,7 +4,8 @@ class Lights {
     constructor(lightColor = 0xffffff) {   
         this.lightColor = lightColor;     
         this.ambient = new AmbientLight(lightColor, 0.5);
-        this.pointLight = new PointLight( lightColor, 1, 100 );
+        this.pointLight = new PointLight({color: '#765CD6', intensity: 0.5, distance: 0 });
+        this.pointLight.position.set( 0, 2, 0 );
         this.spotLight = new SpotLight( lightColor );
         this.hemisphere = new HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
         this.directionalLight = new DirectionalLight(lightColor, 1);

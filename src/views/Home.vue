@@ -1,31 +1,84 @@
 <script setup>
+import { ref } from 'vue';
+
+import ARGuide from '../components/ARGuide.vue';
+import GameGuide from '../components/GameGuide.vue';
+import VRGuide from '../components/VRGuide.vue';
+
+let ar = ref(false);
+let vr = ref(false);
+let game = ref(false);
+
+const changeAR = () => {
+		ar.value = !ar.value;
+		vr.value = false;
+		game.value = false;
+}
+const changeVR = () => {
+		ar.value = false;
+		vr.value = !vr.value;
+		game.value = false;
+}
+const changeGame = () => {
+		ar.value = false;
+		vr.value = false;
+		game.value = !game.value;
+}
 
 </script>
 
 <template>
-	<div>
+	<div class="min-h-screen">
 		<div class="text-gray-600 dark:text-white">
-			<span>
-				<p>
-					Ifc4all es una iniciativa open source, en la que es espera desarrollar una serie de herramientas que
-					tomen como base archivos ifc.
-				</p>
-			</span>
-			<span>
-				<p>
-					Hasta ahora, se ha desarrollado un módulo de realidad extendida (XR), que incluye visualizador VR, AR y
-					un visualizador en modo game.
-				</p>
-			</span>
-			<div>
-				<div class="flex p-5 font-semibold justify-center text-cyan-600 flex-col sm:flex">
-					<p class="row">
-						El módulo Ifc XR creado por wilmercampagna
-						<img src="../assets/logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+			<div class="p-5 text-slate-600 dark:text-cyan-500 text-center text-sm md:text-xl lg:text-2xl">
+				<span class="hover:text-blue-500 hover:dark:text-pink-500">
+					<p>
+						Ifc4all - iniciativa open source con microservicios que explotan el potencial de los
+						archivos ifc, ampliando las posibilidades del OpenBIM.
 					</p>
-					<p class="row">
-						en colaboración con el grupo de investigación GRUA
-						<img src="../assets/grua.png" alt="Logo" class="h-6 w-6 mr-2 ml-2">
+				</span>
+				<span class="hidden sm:block hover:text-blue-500 hover:dark:text-pink-500 m-10">
+					<p class="">
+						Hemos desarrollado un módulo de realidad extendida (XR),
+						el cual incluye visualizadores en VR, AR y un modo game.
+					</p>
+				</span>
+				<span class="p-5 text-blue-800 dark:text-cyan-500">					
+					<p class="flex justify-center">
+						<button class="px-2 sm:px-4">
+							<mdicon class="text-teal-500 dark:text-teal-400 hover:text-blue-500 hover:dark:text-yellow-500 " name="cube-scan"/> 
+						</button>
+						<button class="px-2 sm:px-4">
+							<mdicon class="text-blue-500 dark:text-yellow-500 hover:text-yellow-500 hover:dark:text-pink-500 " name="arrow-right-bottom-bold"/> 
+						</button>
+						<button @click="changeAR" class="px-2 sm:px-4">
+							<mdicon class="hover:text-blue-500 hover:dark:text-yellow-500 " name="augmented-reality"/>
+						</button>
+						<button @click="changeVR" class="px-2 sm:px-4">
+							<mdicon class="hover:text-blue-500 hover:dark:text-yellow-500 " name="virtual-reality"/>
+						</button>
+						<button @click="changeGame" class="px-2 sm:px-4">
+							<mdicon class="hover:text-blue-500 hover:dark:text-yellow-500 " name="controller"/>
+						</button>
+					</p>
+				</span>
+			</div>
+
+			<div>
+				<VRGuide v-if="vr"/>
+				<ARGuide v-if="ar"/>
+				<GameGuide v-if="game"/>
+			</div>
+
+			<div>
+				<div class="flex sm:flex-col p-5 sm:font-semibold justify-center text-slate-600 dark:text-cyan-500 text-xs sm:text-md">
+					<p class="flex justify-center">
+						<span class="hidden sm:flex"> El módulo Ifc XR ha sido desarrollado por wilmercampagna </span>
+						<img class="h-5 w-5 mr-2 ml-2" src="../assets/logo.png" alt="Logo" >
+					</p>
+					<p class="flex flex justify-center">
+						<span class="hidden sm:flex"> en colaboración con el grupo de investigación GRUA de la Universidad del Valle. </span>
+						<img src="../assets/grua.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
 					</p>
 				</div>
 			</div>

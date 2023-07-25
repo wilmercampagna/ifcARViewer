@@ -18,8 +18,8 @@ import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
-// import { VRButton } from '../helpers/VRButton.js';
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { VRButton } from '../helpers/VRButton.js';
+// import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { CanvasUI } from '../helpers/CanvasUI.js';
@@ -63,10 +63,12 @@ export default {
 
 			// Config the VR button
 			renderer.xr.enabled = true;
-			const vrButton = VRButton.createButton(renderer);
-			document.body.appendChild(vrButton);
+			// const vrButton = VRButton.createButton(renderer);
+			const vrButton = new VRButton(renderer);
+			// document.body.appendChild(vrButton);
 
-
+			const session = renderer.xr.getSession();
+			console.log(session);
 
 			function animate() {
 				// requestAnimationFrame(animate);

@@ -12,7 +12,7 @@ import {
 	Line,
 	BufferGeometry,
 	Clock,
-	Quaternion
+	Quaternion,
 } from 'three';
 import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -66,7 +66,41 @@ export default {
 			const vrButton = VRButton.createButton(renderer);
 			document.body.appendChild(vrButton);
 
-
+			// Getting the device position
+			const getDevicePosition = () => {
+				if (renderer.xr.getSession()) {
+					const session = renderer.xr.getSession();
+					const refSpace = renderer.xr.getReferenceSpace();
+					let pose = session.requestAnimationFrame((time, frame) => {
+						pose = frame.getViewerPose(refSpace);
+						if (pose) {
+							camera.position.set(
+							pose.transform.position.x, 
+							pose.transform.position.y, 
+							pose.transform.position.z
+							)
+							// console.log(camera.position)
+						}
+					});
+				} 
+			}
+			// renderer.xr.addEventListener('sessionstart', () => {
+			// 	controls.enabled = false;
+			// 	const session = renderer.xr.getSession();
+			// 	const refSpace = renderer.xr.getReferenceSpace();
+			// 	console.log(session, refSpace)
+			// 	let pose = session.requestAnimationFrame((time, frame) => {
+			// 		pose = frame.getViewerPose(refSpace);
+			// 		if (pose) {
+			// 			camera.position.set(
+			// 				pose.transform.position.x, 
+			// 				pose.transform.position.y, 
+			// 				pose.transform.position.z
+			// 				)
+			// 			console.log(camera.position)
+			// 		}
+			// 	});
+			// });				
 
 			function animate() {
 				// requestAnimationFrame(animate);
@@ -79,6 +113,7 @@ export default {
 				if (controller1) { handleUserMovement(dt) }				
 				controls.update();
 				renderer.render(sceneVR, camera);
+				getDevicePosition();
 			}
 			animate();
 			Resizer(size, renderer, camera);

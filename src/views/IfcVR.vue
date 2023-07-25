@@ -109,11 +109,11 @@ export default {
 
 			const clock = new Clock();
 			const render = () => {
+				getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }				
 				controls.update();
 				renderer.render(sceneVR, camera);
-				getDevicePosition();
 			}
 			animate();
 			Resizer(size, renderer, camera);

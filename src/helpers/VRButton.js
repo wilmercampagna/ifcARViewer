@@ -63,16 +63,16 @@ class VRButton{
 
             self.renderer.xr.setSession( session );
             self.stylizeElement( button, false, 12, true );
-            session.requestReferenceSpace("viewer").then((refSpace)=>{
-                console.log(refSpace)
-                session.requestAnimationFrame((time, frame)=>{
-                    const myviewerPose = frame.getViewerPose(refSpace)
-                    console.log(myviewerPose)
-                });
-                // session.requestHitTestSource({space: refSpace}).then((hitTestSource)=>{ console.log(hitTestSource) });
-                // const viewerPose = session.getViewerPose(refSpace);
-                // console.log(viewerPose)
-            });
+            // session.requestReferenceSpace("viewer").then((refSpace)=>{
+            //     console.log(refSpace)
+            //     session.requestAnimationFrame((time, frame)=>{
+            //         const myviewerPose = frame.getViewerPose(refSpace)
+            //         console.log(myviewerPose)
+            //     });
+            //     // session.requestHitTestSource({space: refSpace}).then((hitTestSource)=>{ console.log(hitTestSource) });
+            //     // const viewerPose = session.getViewerPose(refSpace);
+            //     // console.log(viewerPose)
+            // });
             // refSpace.then((refSpace)=> {
             //     console.log(refSpace)
             //     const viwerPose = actualSession.getViewerPose(refSpace);

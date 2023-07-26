@@ -19,7 +19,6 @@ import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
 import { VRButton } from '../helpers/VRButton.js';
-// import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { CanvasUI } from '../helpers/CanvasUI.js';
@@ -63,12 +62,68 @@ export default {
 
 			// Config the VR button
 			renderer.xr.enabled = true;
-			// const vrButton = VRButton.createButton(renderer);
 			const vrButton = new VRButton(renderer);
-			// document.body.appendChild(vrButton);
 
-			const session = renderer.xr.getSession();
-			console.log(session);
+			// Getting the device position
+			// renderer.xr.addEventListener('sessionstart', () => {
+			// 	if (renderer.xr.getSession()) {
+			// 		const session = renderer.xr.getSession();
+			// 		const refSpace = renderer.xr.getReferenceSpace();
+			// 		let pose = session.requestAnimationFrame((time, frame) => {
+			// 			pose = frame.getViewerPose(refSpace);
+			// 			if (pose) {
+			// 				Get device position and transform the dolly position to it
+			// 				let xrCamera = renderer.xr.getCamera(camera);
+			// 				const saveQuat = xrCamera.quaternion.clone();
+			// 				var holder = new Quaternion()
+			// 				const devicePosition = new Vector3();
+			// 				xrCamera.getWorldQuaternion(holder);
+			// 				xrCamera.quaternion.copy(holder);
+			// 				xrCamera.getWorldPosition(devicePosition);
+			// 				xrCamera.quaternion.copy(saveQuat);
+			// 				console.log(devicePosition)
+			// 				console.log(xrCamera.position)
+
+			// 				console.log(pose.transform.position)
+			// 				console.log(renderer.xr.getCamera().position)
+			// 				pose.transform.position.copy(devicePosition);
+			// 				// dummy.getWorldQuaternion(holder)
+			// 				// dolly.quaternion.copy(holder);
+			// 				// dolly.translateZ(moveZ);
+			// 				// dolly.quaternion.copy(saveQuat)
+			// 			}
+			// 		});
+			// 	}
+			// });
+
+			const getDevicePosition = () => {
+				if (renderer.xr.getSession()) {
+					const session = renderer.xr.getSession();
+					const refSpace = renderer.xr.getReferenceSpace();
+					let pose = session.requestAnimationFrame((time, frame) => {
+						pose = frame.getViewerPose(refSpace);
+						if (pose) {
+							// Get device position and transform the dolly position to it
+							let xrCamera = renderer.xr.getCamera(camera);
+							const saveQuat = xrCamera.quaternion.clone();
+							var holder = new Quaternion()
+							const devicePosition = new Vector3();
+							xrCamera.getWorldQuaternion(holder);
+							xrCamera.quaternion.copy(holder);
+							xrCamera.getWorldPosition(devicePosition);
+							dolly.position.set(
+										pose.transform.position.x, 
+										pose.transform.position.y,
+										pose.transform.position.z)
+							xrCamera.position.set(
+										pose.transform.position.x, 
+										pose.transform.position.y,
+										pose.transform.position.z)
+							xrCamera.quaternion.copy(saveQuat);
+						}
+					});
+				} 
+			}
 
 			function animate() {
 				// requestAnimationFrame(animate);
@@ -77,6 +132,7 @@ export default {
 
 			const clock = new Clock();
 			const render = () => {
+				getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }				
 				controls.update();

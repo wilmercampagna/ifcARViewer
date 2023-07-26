@@ -24,6 +24,7 @@ import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { CanvasUI } from '../helpers/CanvasUI.js';
 import { MousePick } from '../helpers/MousePicker.js';
+import Materials from '../helpers/Materials.js';
 
 export default {
 	name: 'IfcVR',
@@ -35,12 +36,15 @@ export default {
 		const ifcModels = [];
 		setupIfcLoader(ifcLoader);
 
+		const materials = new Materials();
 		const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
 
 		const loadIfcFile = async (change) => {
 			const ifcURL = URL.createObjectURL(change.target.files[0]);
 			const ifcModel = await ifcLoader.loadAsync(ifcURL);
 			const modelCopy = new Mesh(ifcModel.geometry, lambMaterial);
+			ifcModel.material.push(materials.bricksWallMaterial);
+      		ifcModel.mesh.geometry.groups[0].materialIndex = 4;
 			ifcModels.push(ifcModel);
 			sceneVR.add(modelCopy)
 			sceneVR.add(ifcModel)
@@ -68,7 +72,7 @@ export default {
 
 			// Getting the device position
 			const getDevicePosition = () => {
-				if (renderer.xr.getSession()) {
+				if (renderer.xr.getSession() && !renderer.xr.getController(0)) {
 					const session = renderer.xr.getSession();
 					const refSpace = renderer.xr.getReferenceSpace();
 					let pose = session.requestAnimationFrame((time, frame) => {

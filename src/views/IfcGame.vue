@@ -1,6 +1,7 @@
 <script>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
+import IfcThree from '../components/IfcThree.vue'
 import {
   MeshBasicMaterial,
   Mesh,
@@ -19,7 +20,8 @@ export default {
   name: 'IfcGame',
   components: {
     LoadIfcButton,
-  },
+    IfcThree
+},
   setup() {
     const canvas = ref(null);    
     const ifcModels = [];
@@ -130,8 +132,10 @@ export default {
         <div>
           <button class="bg-pink-500 text-white rounded-full p-1" @click="toggleIfcData"> Show data </button>
         </div>
-        <div>
-          <div v-if="ifcDataStructure.length > 0 && showIfcData">
+
+        <div v-if="ifcDataStructure.length > 0 && showIfcData">
+          <IfcThree :data="ifcDataStructure" />
+          <!-- <div >
             <div v-for="model in ifcDataStructure">
               <h2> {{model.type}} {{ model.expressID }} </h2>
               <div>
@@ -146,10 +150,11 @@ export default {
                   </div>
                 </div>
               </div>
-
             </div>
-          </div>
+          </div> -->
+
         </div>
+
       </div>
       <div>
         <canvas ref="canvas"></canvas>

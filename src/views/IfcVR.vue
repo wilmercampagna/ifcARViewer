@@ -12,7 +12,8 @@ import {
 	Line,
 	BufferGeometry,
 	Clock,
-	Quaternion
+	Quaternion,
+	Object3D
 } from 'three';
 import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -64,6 +65,8 @@ export default {
 			renderer.xr.enabled = true;
 			const vrButton = new VRButton(renderer);
 
+			
+
 			// Getting the device position
 			// renderer.xr.addEventListener('sessionstart', () => {
 			// 	if (renderer.xr.getSession()) {
@@ -97,7 +100,7 @@ export default {
 			// });
 
 			const getDevicePosition = () => {
-				if (renderer.xr.getSession()) {
+				if (renderer.xr.getSession() && !renderer.xr.getController(0)) {
 					const session = renderer.xr.getSession();
 					const refSpace = renderer.xr.getReferenceSpace();
 					let pose = session.requestAnimationFrame((time, frame) => {
@@ -134,10 +137,20 @@ export default {
 			const render = () => {
 				getDevicePosition();
 				const dt = clock.getDelta();
-				if (controller1) { handleUserMovement(dt) }				
+				if (controller1) { handleUserMovement(dt) }		
+				if (genericController) { handleUserMovement(dt) }		
 				controls.update();
 				renderer.render(sceneVR, camera);
 			}
+
+			let genericController = new Object3D();
+			genericController.addEventListener('click', allowMovement)
+			// 	// call to handleUserMovement and pass in the render function with dt
+			// 	// handleUserMovement(render, dt)
+
+			// });
+
+
 			animate();
 			Resizer(size, renderer, camera);
 

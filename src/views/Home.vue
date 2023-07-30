@@ -28,10 +28,15 @@ const changeGame = () => {
 </script>
 
 <template>
-	<div class="min-h-screen">
+	<div class="min-h-screen pt-16">
 		<div class="text-gray-600 dark:text-white">
 			<div class="p-5 text-slate-600 dark:text-cyan-500 text-center text-sm md:text-xl lg:text-2xl">
-				<span class="hover:text-blue-500 hover:dark:text-pink-500">
+				<span class="hover:text-blue-500 hover:dark:text-pink-500 text-xl sm:text-2xl md:m-10 md:text-4xl lg:text-5xl">
+					<p>
+						Making BIM dimensions easier
+					</p>
+				</span>
+				<span class="hover:text-blue-500 hover:dark:text-pink-500 m-10 sm:py-10">
 					<p>
 						Ifc4all - iniciativa open source con microservicios que explotan el potencial de los
 						archivos ifc, ampliando las posibilidades del OpenBIM.

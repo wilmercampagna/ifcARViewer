@@ -14,7 +14,7 @@ const camera = cam.camera;
 //Create a scene to add the camera and other objects to
 const sceneAR = new Scene();
 // Add camera, grid, axes and lights to the scene
-camera.position.set(10, 1.5, 20);
+camera.position.set(5, 1, 5);
 sceneAR.add(camera);
 sceneAR.add(lights.ambient);
 sceneAR.add(ax.axes);

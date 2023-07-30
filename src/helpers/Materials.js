@@ -1,4 +1,12 @@
-import { MeshStandardMaterial, MeshPhongMaterial, DoubleSide } from "three";
+import { MeshStandardMaterial, 
+    MeshPhongMaterial, 
+    DoubleSide,
+    ShaderMaterial,
+    Vector2,
+    Vector3
+} from "three";
+import vertexConcrete from '../shaders/concrete/vertex.glsl';
+import fragmentConcrete from '../shaders/concrete/fragment.glsl';
 
 class Materials{
     constructor(){}
@@ -17,6 +25,14 @@ class Materials{
         metalness: 0.2,
         emissive: '#503926',
         depthTest: true,
+    });
+    concreteMaterial = new ShaderMaterial({
+        uniforms: {
+            concreteColor: { value: new Vector3(0.75, 0.75, 0.75) }, // Default gray color
+            roughness: { value: 0.5 }, // Default roughness value
+        },
+        vertexShader: vertexConcrete,
+        fragmentShader: fragmentConcrete,
     });
 }
 

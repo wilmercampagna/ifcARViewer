@@ -7,14 +7,19 @@ import {
   Mesh,
   WebGLRenderer,
   BoxGeometry,
+  PCFShadowMap,
+  // RGBAFormat,
+  ACESFilmicToneMapping,
 } from 'three';
-import { size, camera, cameraDolly, dummyCam } from '../helpers/Camera.js';
+import { size, camera, cameraDolly } from '../helpers/Camera.js';
 import { scene } from '../helpers/configs/Scene.js';
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import { JoyStick } from '../helpers/Toon3D.js';
 import { MousePick } from '../helpers/MousePicker.js';
 import Materials from '../helpers/Materials.js';
+import { useStore } from '../store/index.js';
+import ModelsTransform from '../helpers/TransformModels.js';
 
 export default {
   name: 'IfcGame',
@@ -22,21 +27,26 @@ export default {
     LoadIfcButton,
     IfcThree
 },
-  setup() {
+  setup() {    
     const canvas = ref(null);    
     const ifcModels = [];
     const ifcDataStructure = ref([]);
     setupIfcLoader(ifcLoader);
     const ifcManager = ifcLoader.ifcManager;
 
-    let showIfcData = ref(false);
-    const toggleIfcData = () => {
-      showIfcData.value = !showIfcData.value;
-    }
+    const store = useStore();
 
     // Getting custom materials
     const materials = new Materials();
     const lambMaterial = new MeshBasicMaterial({ transparent: true, opacity: 0.1, color: '#8050D7' });
+
+    const modTransform = new ModelsTransform(ifcModels);
+    const moveModels = modTransform.moveModels;
+
+    // Config the geometry     
+    const cubeGeometry = new BoxGeometry(1, 1, 1);
+    const cube = new Mesh(cubeGeometry, materials.whiteCeramicFloorMaterial);
+    cube.position.set(0, 1, 0);
 
     // Load a ifc file
     const loadIfcFile = async (change) => {
@@ -66,7 +76,6 @@ export default {
 
     onMounted(() => {
 
-
       // Creaeting the joystick
       const joystick = new JoyStick({
         onMove: (forward, turn) => {
@@ -75,19 +84,23 @@ export default {
         },
       });
 
-     
-      const cubeGeometry = new BoxGeometry(1, 1, 1);
-      const cube = new Mesh(cubeGeometry, materials.whiteCeramicFloorMaterial);
-      cube.position.set(0, 1, 0);
-      // scene.add(cube);
-
-      cube.material = materials.bricksWallMaterial;
-      
-
       // Config the renderer      
       const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
       renderer.setSize(size.width, size.height);
+      renderer.shadowMap.enabled = true
+      renderer.shadowMap.type = PCFShadowMap
+      renderer.useLegacyLights = true
+      // renderer.outputColorSpace = RGBAFormat 
+      renderer.toneMapping = ACESFilmicToneMapping
+      renderer.toneMappingExposure = 1
+      
+      scene.add(cube);
 
+      // function to move the cube in z in the scene pressing up and down arrow
+      
+
+      cube.material = materials.concreteMaterial;
+                  
       const outputId = document.getElementById('id-output');
 			const outputDesc = document.getElementById('desc-output');
 			const mousePicker = new MousePick(canvas.value, camera, ifcModels,
@@ -110,7 +123,9 @@ export default {
       document.body.removeChild(theJoystick);
     });
 
-    return { canvas, loadIfcFile, dataTester, ifcDataStructure, toggleIfcData, showIfcData }
+    return { canvas, loadIfcFile, dataTester, ifcDataStructure,
+      store, moveModels
+    }
   }
 };
 </script>
@@ -118,43 +133,26 @@ export default {
 <template>
   <div>
     <div class="relative ">
-      <div class="pl-5 pr-5 w-full absolute">
+      <div class="p-5 mt-10 w-full absolute">
         <div class="flex p-5 font-semibold justify-center text-cyan-600 hidden sm:flex">Ifc XR made for wilmercampagna
-          <img src="../assets/logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+          <button @click="moveModels">
+            <img src="../assets/logo.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+          </button>
           in collaboration with GRUA
-          <img src="../assets/grua.png" alt="Logo" class="h-6  mr-2 ml-2">
+          <button >
+            <img src="../assets/grua.png" alt="Logo" class="h-6  mr-2 ml-2">
+          </button>
         </div>
         <LoadIfcButton :loadFunction="loadIfcFile" />
+        
         <div class="" id="message-container">
           <p class="" id="id-output">_</p>
           <p class="" id="desc-output">_</p>
         </div>
-        <div>
-          <button class="bg-pink-500 text-white rounded-full p-1" @click="toggleIfcData"> Show data </button>
+        <div v-if="ifcDataStructure.length > 0 && store.showIfcData">
+          <IfcThree :data="ifcDataStructure" />          
         </div>
-
-        <div v-if="ifcDataStructure.length > 0 && showIfcData">
-          <IfcThree :data="ifcDataStructure" />
-          <!-- <div >
-            <div v-for="model in ifcDataStructure">
-              <h2> {{model.type}} {{ model.expressID }} </h2>
-              <div>
-                <h3>{{model.children[0].type}} {{ model.children[0].expressID }}</h3>
-                <div>
-                  <h4>{{model.children[0].children[0].type}} {{ model.children[0].children[0].expressID }}</h4>
-                  <div v-for="el in model.children[0].children[0].children">
-                    <p> {{ el.type }} {{ el.expressID }} </p>
-                    <div v-for="subel in el.children">
-                      <p> {{ subel.type }} {{ subel.expressID }} </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
-
-        </div>
-
+        
       </div>
       <div>
         <canvas ref="canvas"></canvas>

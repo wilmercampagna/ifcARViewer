@@ -4,23 +4,30 @@ import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
 	Mesh,
-	WebGLRenderer,
+	WebGLRenderer,	
+	PCFShadowMap,
+  	// RGBAFormat,
+  	ACESFilmicToneMapping,
 } from 'three';
 import { size, camera, sceneAR } from '../helpers/configs/ARScene.js';
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
+import ModelsTransform from '../helpers/TransformModels.js';
+import ARTools from '../components/ARTools.vue';
 
 export default {
 	name: 'IfcAR',
 	components: {
-		LoadIfcButton,
+    	LoadIfcButton,
+    	ARTools,
 	},
 	setup() {
 		const canvas = ref(null);
 		const ifcModels = [];
 		setupIfcLoader(ifcLoader);
+		const scaleFactor = ref(0);
 
 		const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
 
@@ -29,14 +36,35 @@ export default {
 			const ifcModel = await ifcLoader.loadAsync(ifcURL);
 			const modelCopy = new Mesh(ifcModel.geometry, lambMaterial);
 			ifcModels.push(ifcModel);
-			sceneAR.add(modelCopy)
+			// sceneAR.add(modelCopy)
 			sceneAR.add(ifcModel)
+		};
+
+		const modTransform = new ModelsTransform(ifcModels);
+		const scaleModels = modTransform.scaleModels;
+		const moveModels = modTransform.moveModels;
+
+		const makeScale = () => {
+			if(ifcModels.length > 0) {
+				scaleModels(scaleFactor.value);
+			} else {
+				alert('No hay modelos cargados');
+			}
+
 		};
 
 		onMounted(() => {
 			// Config the renderer      
 			const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 			renderer.setSize(size.width, size.height);
+			renderer.setSize(size.width, size.height);
+			renderer.shadowMap.enabled = true
+			renderer.shadowMap.type = PCFShadowMap
+			renderer.useLegacyLights = true
+			// renderer.outputColorSpace = RGBAFormat 
+			renderer.toneMapping = ACESFilmicToneMapping
+			renderer.toneMappingExposure = 1
+
 			const controls = Controls(camera, renderer);
 			controls.update();
 			renderer.xr.enabled = true;
@@ -76,7 +104,7 @@ export default {
 			document.body.removeChild(arBtn);
 		});
 
-		return { canvas, loadIfcFile }
+		return { canvas, loadIfcFile, scaleFactor, makeScale }
 	}
 };
 </script>
@@ -84,7 +112,12 @@ export default {
 <template>
 	<div>
 		<div class="relative ">
-			<div class="pl-5 pr-5 w-full absolute">
+			<div class="pl-5 pr-5 pt-12 w-full absolute">
+				<ARTools v-model:scale="scaleFactor" > 
+					<button @click="makeScale" class="text-white ml-1 hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-1 px-3 rounded-r-full transform ease-in-out duration-300 ">
+						<mdicon name="resize" />
+					</button>
+				</ARTools>
 				<LoadIfcButton :loadFunction="loadIfcFile" />
 			</div>
 			<div>

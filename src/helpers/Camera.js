@@ -3,7 +3,7 @@ import { PerspectiveCamera, Object3D } from 'three';
 class Camera {
     constructor(fov, near, far) {
         this.size = {
-            width: window.innerWidth,
+            width: window.innerWidth-2,
             height: window.innerHeight,
         };
         this.aspect = this.size.width / this.size.height;
@@ -14,7 +14,7 @@ class Camera {
 }
 
 const size = {
-    width: window.innerWidth,
+    width: window.innerWidth-2,
     height: window.innerHeight,
 };
 

@@ -7,13 +7,14 @@ import {
 	MeshLambertMaterial,
 	Mesh,
 	WebGLRenderer,
-	Vector2,
 	Vector3,
 	Line,
 	BufferGeometry,
 	Clock,
-	Quaternion,
-	Object3D
+	Quaternion,	
+	PCFShadowMap,
+ 	 // RGBAFormat,
+  	ACESFilmicToneMapping,
 } from 'three';
 import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -54,6 +55,14 @@ export default {
 			// Config the renderer      
 			const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 			renderer.setSize(size.width, size.height);
+			renderer.setSize(size.width, size.height);
+			renderer.shadowMap.enabled = true
+			renderer.shadowMap.type = PCFShadowMap
+			renderer.useLegacyLights = true
+			// renderer.outputColorSpace = RGBAFormat 
+			renderer.toneMapping = ACESFilmicToneMapping
+			renderer.toneMappingExposure = 1
+
 			const controls = Controls(camera, renderer);
 			controls.enableDamping = true;
 			controls.update();
@@ -147,7 +156,7 @@ export default {
 				renderer.render(sceneVR, camera);
 			}
 
-			let genericController = new Object3D();
+			let genericController = renderer.xr.getController(2);
 			genericController.addEventListener('click', allowMovement)
 			// 	// call to handleUserMovement and pass in the render function with dt
 			// 	// handleUserMovement(render, dt)
@@ -367,7 +376,7 @@ export default {
 <template>
 	<div>
 		<div class="relative ">
-			<div class="pl-5 pr-5 w-full absolute">
+			<div class="pl-5 pr-5 pt-12 w-full absolute">
 				<LoadIfcButton :loadFunction="loadIfcFile" />
 			</div>
 			<div class="absolute" id="message-container">

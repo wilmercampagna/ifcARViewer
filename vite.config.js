@@ -2,12 +2,20 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import legacy from '@vitejs/plugin-legacy'
+import glsl from 'vite-plugin-glsl';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "https://wilmercampagna.github.io/ifcUV",
   plugins: [
     vue(),
+    glsl({
+      include: [                   // Glob pattern, or array of glob patterns to import
+        '**/*.glsl', '**/*.wgsl',
+        '**/*.vert', '**/*.frag',
+        '**/*.vs', '**/*.fs'
+      ],
+    }),
     legacy({
       targets: ['defaults', 'not IE 11'],
     }),

@@ -31,7 +31,7 @@ const openBurger = () => isOpen.value = !isOpen.value
           <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div class="flex flex-shrink-0 items-center">
               <router-link to="/">
-                <img class="block h-8 w-auto " src="../assets/logo.png" alt="Your Company">
+                <img class="block h-8 w-auto " src="../assets/logo.png" alt="ifc4All logo">
               </router-link>     
               <HoverDropdown/>         
               <!-- <a href="/">

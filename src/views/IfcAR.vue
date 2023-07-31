@@ -92,6 +92,10 @@ export default {
 			}
 
 			function render() {
+				if (renderer.xr.getSession()) {
+					makeScale();
+				}
+				// makeScale();
 				renderer.render(sceneAR, camera);
 			}
 			animate();

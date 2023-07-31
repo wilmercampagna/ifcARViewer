@@ -19,8 +19,9 @@ class ModelsTransform {
       const scaleVec = new Vector3(scaleFactor, scaleFactor, scaleFactor);
       // ifcModels[0].scale.copy(scaleVec);
       this.models.forEach((element) => {
-        element.scale.multiply(scaleVec);
-        element.updateMatrix();
+        element.scale.copy(scaleVec);
+        // element.scale.multiply(scaleVec);
+        // element.updateMatrix();
       });
     }
   };

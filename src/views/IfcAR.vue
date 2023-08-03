@@ -6,8 +6,7 @@ import {
 	Mesh,
 	WebGLRenderer,	
 	PCFShadowMap,
-  	// RGBAFormat,
-  	ACESFilmicToneMapping,
+  ACESFilmicToneMapping,
 } from 'three';
 import { size, camera, sceneAR } from '../helpers/configs/ARScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -16,18 +15,53 @@ import Controls from '../helpers/Controls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 import ModelsTransform from '../helpers/TransformModels.js';
 import ARTools from '../components/ARTools.vue';
+import CounterComponent from '../components/Counter.vue';
 
 export default {
 	name: 'IfcAR',
 	components: {
-    	LoadIfcButton,
-    	ARTools,
+    LoadIfcButton,
+    ARTools,
+		CounterComponent,
 	},
 	setup() {
 		const canvas = ref(null);
 		const ifcModels = [];
 		setupIfcLoader(ifcLoader);
 		const scaleFactor = ref(0);
+		const xPos = ref(0);
+		const yPos = ref(0);
+		const zPos = ref(0);
+
+		const tester = ()=> {
+			console.log(xPos.value);
+			console.log(yPos.value);
+			console.log(zPos.value);
+		}
+		const xdec = () => {
+			xPos.value -= 0.1;
+			xPos.value = Number(xPos.value.toFixed(2));
+		};
+		const xinc = () => {
+			xPos.value += 0.1;
+			xPos.value = Number(xPos.value.toFixed(2));
+		};
+		const ydec = () => {
+			yPos.value -= 0.1;
+			yPos.value = Number(yPos.value.toFixed(2));
+		};
+		const yinc = () => {
+			yPos.value += 0.1;
+			yPos.value = Number(yPos.value.toFixed(2));
+		};
+		const zdec = () => {
+			zPos.value -= 0.1;
+			zPos.value = Number(zPos.value.toFixed(2));
+		};
+		const zinc = () => {
+			zPos.value += 0.1;
+			zPos.value = Number(zPos.value.toFixed(2));
+		};
 
 		const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
 
@@ -53,6 +87,14 @@ export default {
 
 		};
 
+		const changePos = () => {
+			if(ifcModels.length > 0) {
+				moveModels(xPos.value, yPos.value, zPos.value);
+			} else {
+				alert('No hay modelos cargados');
+			}
+		};
+
 		onMounted(() => {
 			// Config the renderer      
 			const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
@@ -65,6 +107,12 @@ export default {
 			renderer.toneMapping = ACESFilmicToneMapping
 			renderer.toneMappingExposure = 1
 
+			const bgContainer = document.getElementById('bgContainer');
+			renderer.xr.addEventListener('sessionstart', () => {
+				bgContainer.classList.remove('bg-gradient-to-t', 'from-blue-100', 'via-blue-100',
+					'to-blue-200', 'dark:from-slate-900', 'dark:via-slate-600', 'dark:to-slate-900');
+				bgContainer.classList.add("bg-transparent");
+			});
 			const controls = Controls(camera, renderer);
 			controls.update();
 			renderer.xr.enabled = true;
@@ -94,8 +142,8 @@ export default {
 			function render() {
 				if (renderer.xr.getSession()) {
 					makeScale();
+					changePos();
 				}
-				// makeScale();
 				renderer.render(sceneAR, camera);
 			}
 			animate();
@@ -108,7 +156,8 @@ export default {
 			document.body.removeChild(arBtn);
 		});
 
-		return { canvas, loadIfcFile, scaleFactor, makeScale }
+		return { canvas, loadIfcFile, scaleFactor, makeScale, xPos, yPos, zPos, 
+			changePos, tester, xdec, xinc, ydec, yinc, zdec, zinc}
 	}
 };
 </script>
@@ -118,9 +167,22 @@ export default {
 		<div class="relative ">
 			<div class="pl-5 pr-5 pt-12 w-full absolute">
 				<ARTools v-model:scale="scaleFactor" > 
-					<button @click="makeScale" class="text-white ml-1 hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-1 px-3 rounded-r-full transform ease-in-out duration-300 ">
-						<mdicon name="resize" />
-					</button>
+					<template v-slot:scaleBtn> 
+						<button  @click="makeScale" class="text-white ml-1 hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-1 px-3 rounded-r-full transform ease-in-out duration-300 ">
+							<mdicon name="resize" />
+						</button>
+					</template>
+					<template v-slot:ARTools>
+						<div class="flex">
+							<CounterComponent @increment="xinc" @decrement="xdec" 
+								label-name="x" :counter-value="xPos"/>
+							<CounterComponent @increment="yinc" @decrement="ydec"
+								label-name="y" :counter-value="yPos"/>
+							<CounterComponent @increment="zinc" @decrement="zdec"
+								label-name="z" :counter-value="zPos"/>
+						</div>
+						<button @click="changePos">Clik to test</button>
+					</template>
 				</ARTools>
 				<LoadIfcButton :loadFunction="loadIfcFile" />
 			</div>

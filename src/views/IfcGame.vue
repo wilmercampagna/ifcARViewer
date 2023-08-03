@@ -59,6 +59,7 @@ export default {
       ifcModels.push(ifcModel);
       scene.add(modelCopy)
       scene.add(ifcModel)
+      console.log(ifcModel)
       getIfcDataStructure(modelId);
     };
     

@@ -56,15 +56,16 @@ let currentPath = computed(() => router.currentRoute.value.path);
 				</div>
 				<div>
 					<div>
-						<label for="scale">Scale</label>
+						<label class="text-slate-700 dark:text-white" for="scale">Scale</label>
 						<div class="flex items-center">
 							<input type="number"  min="0" max="10" :value="scale" @input="(el) => $emit('update:scale', parseFloat(el.target.value))" placeholder="Scale" step="0.05" name="scale" id="scale"
 								class="text-white hover:font-bold dark:hover:text-blue-500 p-1 pl-3 rounded-l-full bg-gradient-to-r dark:from-[#1E293B] dark:to-blue-500 
 								from-indigo-500 to-transparent transform ease-in-out duration-300">
-							<slot></slot>
+							<slot name="scaleBtn"></slot>
 						</div>
 					</div>
 				</div>
+				<slot name="ARTools"></slot>
 			</div>
 		</aside>
 	</div>

@@ -9,7 +9,7 @@ class ModelsTransform {
       const newPos = new Vector3(x, y, z);
       this.models.forEach((element) => {
         element.position.copy(newPos);
-        element.updateMatrix();
+        // element.updateMatrix();
       });
     }
   };

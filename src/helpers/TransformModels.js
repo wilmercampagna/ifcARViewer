@@ -12,6 +12,9 @@ class ModelsTransform {
         // element.updateMatrix();
       });
     }
+    else {
+      alert("no models to move");
+    }
   };
 
   scaleModels = (scaleFactor) => {
@@ -23,6 +26,22 @@ class ModelsTransform {
         // element.scale.multiply(scaleVec);
         // element.updateMatrix();
       });
+    }
+    else {
+      alert("no models to scale");
+    }
+  };
+
+  rotateModels = (angle) => {
+    if (this.models.length > 0) {
+      const rotVec = new Vector3(0, 1, 0);
+      this.models.forEach((element) => {
+        element.rotateOnWorldAxis(rotVec, angle);
+        // element.updateMatrix();
+      });
+    }
+    else {
+      alert("no models to rotate");
     }
   };
 }

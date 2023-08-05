@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-// import Home from '../views/Home.vue';
 import IfcAR from './views/IfcAR.vue';
 import IfcVR from './views/IfcVR.vue';
 import IfcGame from './views/IfcGame.vue';

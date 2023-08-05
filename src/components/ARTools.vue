@@ -6,15 +6,15 @@ import router from '../router.js'
 const props = defineProps({
 	scale: {
 		type: Number,
-		// default: 0.5,
+		default: 0.5,
 	},
 })
 
 const isActiveSide = ref(true);
-const isPathsOpen = ref(false);
+const isTransformOpen = ref(false);
 
 const openNav = () => isActiveSide.value = !isActiveSide.value;
-const openPaths = () => isPathsOpen.value = !isPathsOpen.value;
+const openTransform = () => isTransformOpen.value = !isTransformOpen.value;
 const store = useStore();
 let currentPath = computed(() => router.currentRoute.value.path);
 
@@ -49,23 +49,27 @@ let currentPath = computed(() => router.currentRoute.value.path);
 			<div class="max flex text-white mt-20 flex-col space-y-2 w-full h-[calc(100vh)]"
 				:class="isActiveSide ? 'hidden' : 'flex'">				
 				<div >
-					<button class="hover:-ml-4 w-full text-white hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3">
-						<mdicon name="tools" />
-						<div> ARTools </div>
+					<button @click="openTransform" class="hover:-ml-4 w-full text-white hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3">
+						<mdicon name="resize" />
+						<mdicon name="axis-arrow" />
+						<mdicon name="axis-x-rotate-clockwise" />
+						<div> click </div>
 					</button>
 				</div>
-				<div>
-					<div>
-						<label class="text-slate-700 dark:text-white" for="scale">Scale</label>
-						<div class="flex items-center">
-							<input type="number"  min="0" max="10" :value="scale" @input="(el) => $emit('update:scale', parseFloat(el.target.value))" placeholder="Scale" step="0.05" name="scale" id="scale"
-								class="text-white hover:font-bold dark:hover:text-blue-500 p-1 pl-3 rounded-l-full bg-gradient-to-r dark:from-[#1E293B] dark:to-blue-500 
-								from-indigo-500 to-transparent transform ease-in-out duration-300">
-							<slot name="scaleBtn"></slot>
+				<div v-if="isTransformOpen">
+					<div >
+						<div class="">
+							<label class="text-slate-700 dark:text-white" for="scale">Scale</label>
+							<div class="flex justify-center">
+								<input type="number"  min="0" max="10" :value="scale" @input="(el) => $emit('update:scale', parseFloat(el.target.value))" placeholder="Scale" step="0.05" name="scale" id="scale"
+									class="text-white hover:font-bold dark:hover:text-blue-500 p-1 pl-3 rounded-l-full bg-gradient-to-r dark:from-[#1E293B] dark:to-blue-500 
+									from-indigo-500 to-transparent transform ease-in-out duration-300">
+								<slot name="scaleBtn"></slot>
+							</div>
 						</div>
 					</div>
+					<slot name="ARTools"></slot>
 				</div>
-				<slot name="ARTools"></slot>
 			</div>
 		</aside>
 	</div>

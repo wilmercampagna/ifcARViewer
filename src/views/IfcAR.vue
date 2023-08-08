@@ -18,6 +18,7 @@ import ModelsTransform from '../helpers/TransformModels.js';
 import ARTools from '../components/ARTools.vue';
 import Counter from '../components/basics/Counter.vue';
 import CallbackBtn from '../components/basics/ARCallbackButton.vue';
+import IfcClassAR from '../components/IfcClassAR.vue';
 
 const canvas = ref(null);
 const ifcModels = [];
@@ -26,12 +27,22 @@ const scaleFactor = ref(0.5);
 const xPos = ref(0);
 const yPos = ref(0);
 const zPos = ref(0);
+const isTypeOpen = ref(false);
 
+const openType = () => isTypeOpen.value = !isTypeOpen.value;
 const tester = () => {
-	console.log(xPos.value);
-	console.log(yPos.value);
-	console.log(zPos.value);
+	console.log(ifcModels[0].name, ifcModels[0].modelID);
+	console.log('Hola')
 }
+
+const ifcClasses = [
+	'ifcWall',
+	'ifcColumn',
+	'ifcBeam',
+	'ifcSlab',
+	'ifcStair',
+]
+
 const xdec = () => {
 	xPos.value -= 0.1;
 	xPos.value = Number(xPos.value.toFixed(2));
@@ -60,12 +71,17 @@ const zinc = () => {
 const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
 
 const loadIfcFile = async (change) => {
-	const ifcURL = URL.createObjectURL(change.target.files[0]);
+	const modelName = change.target.files[0].name;
+	const ifcURL = URL.createObjectURL(change.target.files[0]);	
 	const ifcModel = await ifcLoader.loadAsync(ifcURL);
 	const modelCopy = new Mesh(ifcModel.geometry, lambMaterial);
+	ifcModel.name = modelName;
 	ifcModels.push(ifcModel);
 	// sceneAR.add(modelCopy)
 	sceneAR.add(ifcModel)
+	console.log(ifcModel)
+	const modelTypes = await ifcLoader.ifcManager.types.state.api.GetAllTypesOfModel(0);
+	console.log(modelTypes)
 };
 
 const modTransform = new ModelsTransform(ifcModels);
@@ -133,14 +149,12 @@ onBeforeUnmount(() => {
 	<div>
 		<div class="relative ">
 			<div class="pl-5 pr-5 pt-12 w-full absolute">
-				<ARTools v-model:scale="scaleFactor">
+				<ARTools @activeCrop="tester" @starMeasure="tester" @showTypes="openType" 
+					v-model:scale="scaleFactor">
 					<template v-slot:scaleBtn>
-						<button @click="makeScale"
-							class="text-white ml-1 hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-1 px-3 rounded-r-full transform ease-in-out duration-300 ">
-							<mdicon name="resize" />
-						</button>
+						<CallbackBtn someClass="rounded-r-full" icon-name="resize" @function="makeScale"/>
 					</template>
-					<template v-slot:ARTools>
+					<template v-slot:ARTools>						
 						<div class="border-t-2 border-sky-600 mt-3 pt-3">
 							<label>Displacement</label>
 							<div class="flex">
@@ -148,19 +162,23 @@ onBeforeUnmount(() => {
 								<Counter @increment="yinc" @decrement="ydec" label-name="y" :counter-value="yPos" />
 								<Counter @increment="zinc" @decrement="zdec" label-name="z" :counter-value="zPos" />
 							</div>						
-							<CallbackBtn class="mt-2" text="Move model" icon-name="axis-arrow" @function="changePos"/>
+							<CallbackBtn someClass="rounded-full" class="mt-2" text="Move model" icon-name="axis-arrow" @function="changePos"/>
 						</div>
 						<div class="border-t-2 border-sky-600 mt-3 pt-3">
 							<label>Rotate</label>
 							<div class="flex">
-								<CallbackBtn class="" icon-name="phone-rotate-portrait" @function="rotateLeft"/>
-								<CallbackBtn class="" icon-name="phone-rotate-landscape" @function="rotateRight"/>
+								<CallbackBtn someClass="rounded-l-full" icon-name="phone-rotate-portrait" @function="rotateLeft"/>
+								<CallbackBtn someClass="rounded-r-full" icon-name="phone-rotate-landscape" @function="rotateRight"/>
 							</div>
 						</div>
-						<div class="border-t-2 border-sky-600 mt-3 pt-3"></div>
+						<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div>						
 					</template>
 				</ARTools>
 				<LoadIfcButton :loadFunction="loadIfcFile" />
+				<IfcClassAR :ifc-classes="ifcClasses" v-if="isTypeOpen"/>
+				<div>
+
+				</div>
 			</div>
 			<div>
 				<canvas ref="canvas"></canvas>

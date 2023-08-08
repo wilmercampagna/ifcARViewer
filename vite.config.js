@@ -3,11 +3,13 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import legacy from '@vitejs/plugin-legacy'
 import glsl from 'vite-plugin-glsl';
+// import { comlink } from 'vite-plugin-comlink' // To use with web workers
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "https://wilmercampagna.github.io/ifcUV",
   plugins: [
+    // comlink(),
     vue(),
     glsl({
       include: [                   // Glob pattern, or array of glob patterns to import
@@ -136,4 +138,9 @@ export default defineConfig({
       }
     ),
   ],
+  // worker: {
+  //   plugins: [
+  //     comlink()
+  //   ]
+  // }
 })

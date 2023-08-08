@@ -7,18 +7,19 @@
   
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #1e293b;
 }
   
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    /* background: #888; */
     border-radius: 5px;
+    background: linear-gradient(180deg, rgb(30 27 75) 0%, rgb(129 140 248) 100%);
 }
   
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: linear-gradient(180deg, rgb(7 89 133) 0%, rgb(34 211 238) 100%);
 }
 
 @tailwind components;

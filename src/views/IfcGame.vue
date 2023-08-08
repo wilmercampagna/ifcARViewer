@@ -67,7 +67,20 @@ export default {
     const getIfcDataStructure = async (modelId) => {
       const ifcData = await ifcManager.getSpatialStructure(modelId);
       ifcDataStructure.value.push(ifcData);
-      console.log(ifcData)
+      const elements = ifcData.children[0].children[0].children;
+      let elType = []
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i].children;
+        elType.push(...element)
+      }
+      const uniqueTypes = []
+      const unique = elType.filter(el => {
+        const isDuplicate = uniqueTypes.includes(el.type);
+        if (!isDuplicate) {
+          uniqueTypes.push(el.type);
+        }
+      })
+      console.log(uniqueTypes)
     }
 
     const dataTester = () => {

@@ -19,6 +19,7 @@ import ARTools from '../components/ARTools.vue';
 import Counter from '../components/basics/Counter.vue';
 import CallbackBtn from '../components/basics/ARCallbackButton.vue';
 import IfcClassAR from '../components/IfcClassAR.vue';
+import { mdiEmoticonKiss } from '@mdi/js';
 
 const canvas = ref(null);
 const ifcModels = [];
@@ -70,16 +71,14 @@ const loadIfcFile = async (change) => {
 	const modelId = ifcModel.modelID;
 	ifcModels.push(ifcModel);
 	sceneAR.add(ifcModel)
-	console.log(ifcModel)
-	const objectTypes = await getAllSpatialTypes(modelId, ifcLoader);
-	console.log(objectTypes)
+	getAllSpatialTypes(modelId, ifcLoader);
+	console.log(ifcClasses)
+	getName()
 	setupAllCategories(modelId);
 	console.log(ifcModel)
-	console.log(subsets)
 };
 
 const getAllSpatialTypes = async (modelId, ifcLoader) => {
-	// const modelTypes = await ifcLoader.ifcManager.getAllItemsOfType(modelId);
 	const modelTypes = await ifcLoader.ifcManager.types.state.api.GetAllTypesOfModel(modelId);
 	const ifcModelClass = await getIfcDataStructure(modelId);
 	const objectTypes = []
@@ -89,8 +88,7 @@ const getAllSpatialTypes = async (modelId, ifcLoader) => {
 			objectTypes.push(el);
 		}
 	})
-	ifcClasses.push(...objectTypes);
-	return objectTypes;
+	ifcClasses.push(objectTypes);
 }
 
 const getIfcDataStructure = async (modelId) => {
@@ -118,20 +116,21 @@ const rotateLeft = () => modTransform.rotateModels(Math.PI / 32);
 const rotateRight = () => modTransform.rotateModels(-Math.PI / 32);
 
 // Gets the name of a category
+function getName() {
 // function getName(category) {
-//   const names = Object.keys(ifcClasses);
-//   return names.find((name) => ifcClasses[name] === category);
-// }
+  const names = ifcClasses.forEach(el => console.log(el))
+  // return ifcClasses.find((name) => ifcClasses[name] === category);
+}
 
 // Gets the IDs of all the items of a specific category
 const getAll = async (category, modelId) => {
 	const manager = ifcLoader.ifcManager;
-  	return manager.getAllItemsOfType(modelId, category, false);
+  	return manager.getAllItemsOfType(modelId, category.typeID, false);
 }
 
 // Creates a new subset containing all elements of a category
 async function newSubsetOfType(category, modelId) {
-  const ids = await getAll(category.typeID, modelId);
+  const ids = await getAll(category, modelId);
   return ifcLoader.ifcManager.createSubset({
     modelID: modelId,
     sceneAR,
@@ -164,14 +163,15 @@ const highLightType = (category) => {
 }
 
 const visibilizeTypes = (category) => {
-	const name = getName(category);
-	const subset = subsets[category];
-	console.log(category)
+	// const name = getName(category);
+	const subset = subsets[category.typeName];
+	console.log(subset)
+	subset.removeFromParent();
 }
 
 const makeTypesTransparent = (category) => {
-	const name = getName(category);
-	const subset = subsets[category];
+	// const name = getName(category);
+	const subset = subsets[category.typeName];
 	console.log(category)
 }
 

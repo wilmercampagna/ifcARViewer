@@ -21,9 +21,9 @@ const props = defineProps({
       </div>
       <div v-for="el in ifcClasses" class="flex text-white flex-row items-center justify-center w-full">
         <CallbackBtn some-class="w-40 text-xs h-8" :text="el.typeName" @function="$emit('ifcClass', el)"/>
-        <CallbackBtn @function="$emit('onOff', el)" :key="el.TypeID" some-class="text-yellow-400 w-14 text-xs" 
+        <CallbackBtn @function="$emit('onOff', el)" :key="el.index" some-class="text-yellow-400 w-14 text-xs" 
             icon-name="sun-wireless-outline"/>
-        <CallbackBtn @function="$emit('turnOpacity', el)" :key="el.TypeID" some-class="w-14 text-xs" 
+        <CallbackBtn @function="$emit('turnOpacity', el)" :key="el.index" some-class="w-14 text-xs" 
             icon-name="water-opacity"/>
       </div>
     </div>

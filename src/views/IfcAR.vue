@@ -70,7 +70,9 @@ const loadIfcFile = async (change) => {
 	const modelId = ifcModel.modelID;
 	ifcModels.push(ifcModel);
 	sceneAR.add(ifcModel)
+	console.log(ifcModel)
 	const objectTypes = await getAllSpatialTypes(modelId, ifcLoader);
+	console.log(objectTypes)
 	setupAllCategories(modelId);
 	console.log(ifcModel)
 	console.log(subsets)
@@ -124,13 +126,12 @@ const rotateRight = () => modTransform.rotateModels(-Math.PI / 32);
 // Gets the IDs of all the items of a specific category
 const getAll = async (category, modelId) => {
 	const manager = ifcLoader.ifcManager;
-	const allElementsOfType = await manager.getAllItemsOfType(modelId, category.typeID, false);
-  return allElementsOfType;
+  	return manager.getAllItemsOfType(modelId, category, false);
 }
 
 // Creates a new subset containing all elements of a category
 async function newSubsetOfType(category, modelId) {
-  const ids = await getAll(category, modelId);
+  const ids = await getAll(category.typeID, modelId);
   return ifcLoader.ifcManager.createSubset({
     modelID: modelId,
     sceneAR,
@@ -141,27 +142,15 @@ async function newSubsetOfType(category, modelId) {
 }
 
 // Stores the created subsets
-const subsets = [];
+const subsets = {};
 
 async function setupAllCategories(modelId) {
-  const allCategories = Object.values(ifcClasses);
-	const modelSets = {}
-  for (let i = 0; i < allCategories.length; i++) {
-    const category = allCategories[i];
+  // const allCategories = Object.values(ifcClasses);
+  for (let i = 0; i < ifcClasses.length; i++) {
+    const category = ifcClasses[i];
     // await setupCategory(category);
-		// subsets.modelId;
-		const res = await newSubsetOfType(category, modelId);
-		// console.log(res)
-		modelSets[category.typeName] = res;
-		// subsets.modelId[category.typeName] = await newSubsetOfType(category, modelId);
-		// subsets[category.typeName] = await newSubsetOfType(category, modelId);
+		subsets[category.typeName] = await newSubsetOfType(category, modelId);
   }
-	const sets = {
-		modelId: modelId,
-		modelName: ifcModels[modelId].name,
-		types: modelSets
-	}
-	subsets.push(sets)
 }
 
 // Creates a new subset and configures the checkbox
@@ -175,14 +164,14 @@ const highLightType = (category) => {
 }
 
 const visibilizeTypes = (category) => {
-	// const name = getName(category);
-	// const subset = subsets[category];
+	const name = getName(category);
+	const subset = subsets[category];
 	console.log(category)
 }
 
 const makeTypesTransparent = (category) => {
-	// const name = getName(category);
-	// const subset = subsets[category];
+	const name = getName(category);
+	const subset = subsets[category];
 	console.log(category)
 }
 

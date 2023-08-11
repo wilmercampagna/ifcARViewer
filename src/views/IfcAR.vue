@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, normalizeStyle } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
@@ -19,6 +19,7 @@ import ARTools from '../components/ARTools.vue';
 import Counter from '../components/basics/Counter.vue';
 import CallbackBtn from '../components/basics/ARCallbackButton.vue';
 import IfcClassAR from '../components/IfcClassAR.vue';
+import { mdiVideo2d } from '@mdi/js';
 
 const canvas = ref(null);
 const ifcModels = [];
@@ -60,7 +61,7 @@ const zinc = () => {
 };
 
 const ifcClasses = [];
-// const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
+const transparentColor = new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: 0x77aaff });
 
 const loadIfcFile = async (change) => {
 	const modelName = change.target.files[0].name;
@@ -69,10 +70,8 @@ const loadIfcFile = async (change) => {
 	ifcModel.name = modelName;
 	const modelId = ifcModel.modelID;
 	ifcModels.push(ifcModel);
-	sceneAR.add(ifcModel)
-	console.log(ifcModel)
+	// sceneAR.add(ifcModel)
 	const objectTypes = await getAllSpatialTypes(modelId, ifcLoader);
-	console.log(objectTypes)
 	setupAllCategories(modelId);
 	console.log(ifcModel)
 	console.log(subsets)
@@ -111,16 +110,13 @@ const getIfcDataStructure = async (modelId) => {
 	return uniqueTypes;
 }
 
-const modTransform = new ModelsTransform(ifcModels);
-const makeScale = () => modTransform.scaleModels(scaleFactor.value);
-const changePos = () => modTransform.moveModels(xPos.value, yPos.value, zPos.value);
-const rotateLeft = () => modTransform.rotateModels(Math.PI / 32);
-const rotateRight = () => modTransform.rotateModels(-Math.PI / 32);
 
 // Gets the name of a category
+// function getName() {
 // function getName(category) {
-//   const names = Object.keys(ifcClasses);
-//   return names.find((name) => ifcClasses[name] === category);
+//   const names = []
+// 	ifcClasses.forEach((el) => names.push(el.typeName))
+//   return names.find((name) => ifcClasses[name] === category.typeName);
 // }
 
 // Gets the IDs of all the items of a specific category
@@ -143,36 +139,57 @@ async function newSubsetOfType(category, modelId) {
 
 // Stores the created subsets
 const subsets = {};
+const transparentSubsets = {};
 
 async function setupAllCategories(modelId) {
-  // const allCategories = Object.values(ifcClasses);
   for (let i = 0; i < ifcClasses.length; i++) {
     const category = ifcClasses[i];
-    // await setupCategory(category);
 		subsets[category.typeName] = await newSubsetOfType(category, modelId);
+		const subsetCopy = new Mesh(subsets[category.typeName].geometry, transparentColor);
+		transparentSubsets[category.typeName] = subsetCopy;
+		// subsets[category.typeName].initialMaterial = subsets[category.typeName].material;
+		sceneAR.add(subsets[category.typeName]);
+		sceneAR.add(transparentSubsets[category.typeName]);
   }
 }
 
-// Creates a new subset and configures the checkbox
-// async function setupCategory(category) {
-//   subsets[category] = await newSubsetOfType(category);
-//   visibilizeTypes(category);
-// }
+const modTransform = new ModelsTransform(subsets, ifcClasses);
+const mod2Transform = new ModelsTransform(transparentSubsets, ifcClasses);
+const makeScale = () => {
+	modTransform.scaleModels(scaleFactor.value);
+	mod2Transform.scaleModels(scaleFactor.value);
+}
+const changePos = () => {
+	modTransform.moveModels(xPos.value, yPos.value, zPos.value);
+	mod2Transform.moveModels(xPos.value, yPos.value, zPos.value);
+} 
+const rotateLeft = () => {
+	modTransform.rotateModels(Math.PI / 32);
+	mod2Transform.rotateModels(Math.PI / 32);
+}
+const rotateRight = () => {
+	modTransform.rotateModels(-Math.PI / 32);
+	mod2Transform.rotateModels(-Math.PI / 32);
+}
 
 const highLightType = (category) => {
-	console.log(category)
+	const subset = subsets[category.typeName];
+	console.log(subset)
+	console.log(transparentSubsets)
 }
 
 const visibilizeTypes = (category) => {
-	const name = getName(category);
-	const subset = subsets[category];
-	console.log(category)
+	const subset = subsets[category.typeName];
+	const subsetCopy = transparentSubsets[category.typeName]
+	subset.visible = !subset.visible;
+	subsetCopy.visible = subset.visible;
 }
 
 const makeTypesTransparent = (category) => {
-	const name = getName(category);
-	const subset = subsets[category];
-	console.log(category)
+	const subset = subsets[category.typeName];
+	const subsetCopy = transparentSubsets[category.typeName]
+	subset.visible = !subset.visible;
+	subsetCopy.visible = !subset.visible;
 }
 
 onMounted(() => {
@@ -234,7 +251,9 @@ onBeforeUnmount(() => {
 	<div>
 		<div class="relative ">
 			<div class="pl-5 pr-5 pt-12 w-full absolute">
-				<ARTools @activeCrop="tester" @starMeasure="tester" @showTypes="openType" v-model:scale="scaleFactor">
+				<ARTools @activeCrop="tester" @starMeasure="tester" @showTypes="openType" 
+					@rotateLeft="rotateLeft" @rotateRight="rotateRight" 
+					v-model:scale="scaleFactor">
 					<template v-slot:scaleBtn>
 						<CallbackBtn someClass="rounded-r-full" icon-name="resize" @function="makeScale" />
 					</template>
@@ -249,7 +268,7 @@ onBeforeUnmount(() => {
 							<CallbackBtn someClass="rounded-full" class="mt-2" text="Move model" icon-name="axis-arrow"
 								@function="changePos" />
 						</div>
-						<div class="border-t-2 border-sky-600 mt-3 pt-3">
+						<!-- <div class="border-t-2 border-sky-600 mt-3 pt-3">
 							<label>Rotate</label>
 							<div class="flex">
 								<CallbackBtn someClass="rounded-l-full" icon-name="phone-rotate-portrait"
@@ -258,7 +277,7 @@ onBeforeUnmount(() => {
 									@function="rotateRight" />
 							</div>
 						</div>
-						<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div>
+						<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div> -->
 					</template>
 				</ARTools>
 				<LoadIfcButton :loadFunction="loadIfcFile" />

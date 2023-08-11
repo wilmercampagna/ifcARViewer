@@ -1,14 +1,15 @@
 import { Vector3 } from "three";
 
 class ModelsTransform {
-  constructor(models) {
+  constructor(models, ifcClasses) {
     this.models = models;
+    this.ifcClasses = ifcClasses;
   }
   moveModels = (x, y, z) => {
-    if (this.models.length > 0) {
+    if (this.ifcClasses.length > 0) {
       const newPos = new Vector3(x, y, z);
-      this.models.forEach((element) => {
-        element.position.copy(newPos);
+      this.ifcClasses.forEach((element) => {
+        this.models[element.typeName].position.copy(newPos);
         // element.updateMatrix();
       });
     }
@@ -18,13 +19,10 @@ class ModelsTransform {
   };
 
   scaleModels = (scaleFactor) => {
-    if (this.models.length > 0) {
+    if (this.ifcClasses.length > 0) {
       const scaleVec = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-      // ifcModels[0].scale.copy(scaleVec);
-      this.models.forEach((element) => {
-        element.scale.copy(scaleVec);
-        // element.scale.multiply(scaleVec);
-        // element.updateMatrix();
+      this.ifcClasses.forEach((element) => {
+        this.models[element.typeName].scale.copy(scaleVec);
       });
     }
     else {
@@ -33,10 +31,10 @@ class ModelsTransform {
   };
 
   rotateModels = (angle) => {
-    if (this.models.length > 0) {
+    if (this.ifcClasses.length > 0) {
       const rotVec = new Vector3(0, 1, 0);
-      this.models.forEach((element) => {
-        element.rotateOnWorldAxis(rotVec, angle);
+      this.ifcClasses.forEach((element) => {
+        this.models[element.typeName].rotateOnWorldAxis(rotVec, angle);
         // element.updateMatrix();
       });
     }

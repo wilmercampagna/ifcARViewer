@@ -1,13 +1,17 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, normalizeStyle } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
+	MeshPhongMaterial,
 	Mesh,
 	WebGLRenderer,
 	PCFShadowMap,
 	ACESFilmicToneMapping,
 	Vector3,
+	ConeGeometry,
+	Plane,
+	PointLight,
 } from 'three';
 import { size, camera, sceneAR } from '../helpers/configs/ARScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -19,20 +23,25 @@ import ARTools from '../components/ARTools.vue';
 import Counter from '../components/basics/Counter.vue';
 import CallbackBtn from '../components/basics/ARCallbackButton.vue';
 import IfcClassAR from '../components/IfcClassAR.vue';
-import { mdiVideo2d } from '@mdi/js';
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
 const canvas = ref(null);
 const ifcModels = [];
-setupIfcLoader(ifcLoader);
 const scaleFactor = ref(0.5);
 const xPos = ref(0);
 const yPos = ref(0);
 const zPos = ref(0);
 const isTypeOpen = ref(false);
+let renderer;
+let controls;
+let tcontrols1;
+let tcontrols2;
+let tcontrols3;
 
+setupIfcLoader(ifcLoader);
 const openType = () => isTypeOpen.value = !isTypeOpen.value;
 const tester = (el) => {
-	console.log(el)
+	console.log('Any thing')
 }
 
 const xdec = () => {
@@ -66,15 +75,18 @@ const transparentColor = new MeshLambertMaterial({ transparent: true, opacity: 0
 const loadIfcFile = async (change) => {
 	const modelName = change.target.files[0].name;
 	const ifcURL = URL.createObjectURL(change.target.files[0]);
+	// const ifcModel = ifcLoader.load(ifcURL);
 	const ifcModel = await ifcLoader.loadAsync(ifcURL);
 	ifcModel.name = modelName;
 	const modelId = ifcModel.modelID;
 	ifcModels.push(ifcModel);
 	// sceneAR.add(ifcModel)
-	const objectTypes = await getAllSpatialTypes(modelId, ifcLoader);
+	await getAllSpatialTypes(modelId, ifcLoader);
 	setupAllCategories(modelId);
-	console.log(ifcModel)
-	console.log(subsets)
+	if (ifcModels.length < 2) {
+		setupClippingPlanes(renderer)
+		turnClipping()
+	}
 };
 
 const getAllSpatialTypes = async (modelId, ifcLoader) => {
@@ -111,30 +123,22 @@ const getIfcDataStructure = async (modelId) => {
 }
 
 
-// Gets the name of a category
-// function getName() {
-// function getName(category) {
-//   const names = []
-// 	ifcClasses.forEach((el) => names.push(el.typeName))
-//   return names.find((name) => ifcClasses[name] === category.typeName);
-// }
-
 // Gets the IDs of all the items of a specific category
 const getAll = async (category, modelId) => {
 	const manager = ifcLoader.ifcManager;
-  	return manager.getAllItemsOfType(modelId, category, false);
+	return manager.getAllItemsOfType(modelId, category, false);
 }
 
 // Creates a new subset containing all elements of a category
 async function newSubsetOfType(category, modelId) {
-  const ids = await getAll(category.typeID, modelId);
-  return ifcLoader.ifcManager.createSubset({
-    modelID: modelId,
-    sceneAR,
-    ids,
-    removePrevious: true,
-    customID: category.typeName.toString(),
-  });
+	const ids = await getAll(category.typeID, modelId);
+	return ifcLoader.ifcManager.createSubset({
+		modelID: modelId,
+		sceneAR,
+		ids,
+		removePrevious: true,
+		customID: category.typeName.toString(),
+	});
 }
 
 // Stores the created subsets
@@ -142,15 +146,15 @@ const subsets = {};
 const transparentSubsets = {};
 
 async function setupAllCategories(modelId) {
-  for (let i = 0; i < ifcClasses.length; i++) {
-    const category = ifcClasses[i];
+	for (let i = 0; i < ifcClasses.length; i++) {
+		const category = ifcClasses[i];
 		subsets[category.typeName] = await newSubsetOfType(category, modelId);
 		const subsetCopy = new Mesh(subsets[category.typeName].geometry, transparentColor);
 		transparentSubsets[category.typeName] = subsetCopy;
 		// subsets[category.typeName].initialMaterial = subsets[category.typeName].material;
 		sceneAR.add(subsets[category.typeName]);
 		sceneAR.add(transparentSubsets[category.typeName]);
-  }
+	}
 }
 
 const modTransform = new ModelsTransform(subsets, ifcClasses);
@@ -162,7 +166,7 @@ const makeScale = () => {
 const changePos = () => {
 	modTransform.moveModels(xPos.value, yPos.value, zPos.value);
 	mod2Transform.moveModels(xPos.value, yPos.value, zPos.value);
-} 
+}
 const rotateLeft = () => {
 	modTransform.rotateModels(Math.PI / 32);
 	mod2Transform.rotateModels(Math.PI / 32);
@@ -192,17 +196,22 @@ const makeTypesTransparent = (category) => {
 	subsetCopy.visible = !subset.visible;
 }
 
+
 onMounted(() => {
+
 	// Config the renderer      
-	const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
+	renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 	renderer.setSize(size.width, size.height);
 	renderer.setSize(size.width, size.height);
 	renderer.shadowMap.enabled = true
 	renderer.shadowMap.type = PCFShadowMap
 	renderer.useLegacyLights = true
-	// renderer.outputColorSpace = RGBAFormat 
 	renderer.toneMapping = ACESFilmicToneMapping
 	renderer.toneMappingExposure = 1
+
+	// Clipping Planes
+	// renderer.clippingPlanes = [];
+	renderer.localClippingEnabled = true;	
 
 	const bgContainer = document.getElementById('bgContainer');
 	renderer.xr.addEventListener('sessionstart', () => {
@@ -210,7 +219,7 @@ onMounted(() => {
 			'to-blue-200', 'dark:from-slate-900', 'dark:via-slate-600', 'dark:to-slate-900');
 		bgContainer.classList.add("bg-transparent");
 	});
-	const controls = Controls(camera, renderer);
+	controls = Controls(camera, renderer);
 	controls.update();
 	renderer.xr.enabled = true;
 	const arButton = ARButton.createButton(renderer, {
@@ -237,7 +246,7 @@ onMounted(() => {
 	}
 	animate();
 	Resizer(size, renderer, camera);
-	return { canvas }
+	return { canvas, renderer, controls }
 })
 
 onBeforeUnmount(() => {
@@ -245,15 +254,87 @@ onBeforeUnmount(() => {
 	document.body.removeChild(arBtn);
 });
 
+const clipPlanes = [];
+let draggerMesh;
+const setupClippingPlanes = (renderer) => {
+	const bounds = ifcModels[0].geometry.boundingBox;
+
+	// Create draggable sphere at the center of bounds
+	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.8 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
+	const draggerGeometry = new ConeGeometry(0.5, 1, 4);
+	const draggerMaterial = new MeshPhongMaterial({
+		color: '#049ef4',
+		emissive: '#049ef4',
+		shininess: 80,
+		reflectivity: 0.8,
+	});
+	const pLight = new PointLight({
+		color: '#4f53d8',
+		intensity: 1,
+		distance: 3,
+
+	})
+	pLight.position.copy(initialDragPosition);
+	draggerMesh = new Mesh(draggerGeometry, draggerMaterial);
+	draggerMesh.attach(pLight)
+	draggerMesh.position.copy(initialDragPosition);
+	draggerMesh.name = 'yDragger'
+	sceneAR.add(draggerMesh);
+
+	// Prepare a clipping plane
+	const orientation = new Vector3(0, -1, 0);
+	const plane = new Plane();
+	let planePosition = new Vector3(initialDragPosition.x, initialDragPosition.y+1, initialDragPosition.z);
+	plane.setFromNormalAndCoplanarPoint(orientation, planePosition);
+	clipPlanes.push(plane);
+	renderer.clippingPlanes = [plane];
+
+	// Handle drag events
+	const dControls = new DragControls([draggerMesh], camera, renderer.domElement);
+	dControls.addEventListener('drag', () => {
+		// Fix XZ-poistion
+		controls.enabled = false;
+		draggerMesh.position.set(initialDragPosition.x, draggerMesh.position.y, initialDragPosition.z);
+		draggerMesh.updateWorldMatrix();
+		// Update clipping plane
+		planePosition = new Vector3(draggerMesh.position.x, draggerMesh.position.y+1, draggerMesh.position.z);
+		plane.setFromNormalAndCoplanarPoint(new Vector3(0, -1, 0), planePosition);
+	});
+
+	dControls.addEventListener('dragend', () => {
+		controls.enabled = true;
+	});
+	// When we are hovering over a sphere we want to disable viewer dC	controls.addEventListener('hoveron', () => {
+	dControls.addEventListener('hoveron', () => {		
+  	camera.visible = false;
+  	draggerMaterial.color.set('#f14668');
+	});
+
+	// And turn them back on when we stop hovering over it
+	dControls.addEventListener('hoveroff', () => {		
+		camera.visible = true;
+		draggerMaterial.color.set('#049ef4');
+	});
+}
+
+const turnClipping = () => {
+	if (renderer.clippingPlanes.length > 0) {
+		renderer.clippingPlanes = [];
+		draggerMesh.visible = !draggerMesh.visible;
+	} else {
+		renderer.clippingPlanes = clipPlanes;
+		draggerMesh.visible = !draggerMesh.visible;
+	}
+}
+
 </script>
 
 <template>
 	<div>
 		<div class="relative ">
 			<div class="pl-5 pr-5 pt-12 w-full absolute">
-				<ARTools @activeCrop="tester" @starMeasure="tester" @showTypes="openType" 
-					@rotateLeft="rotateLeft" @rotateRight="rotateRight" 
-					v-model:scale="scaleFactor">
+				<ARTools @rotateLeft="rotateLeft" @rotateRight="rotateRight" @showTypes="openType" @activeCrop="turnClipping"
+					@startMeasure="turnClipping" v-model:scale="scaleFactor">
 					<template v-slot:scaleBtn>
 						<CallbackBtn someClass="rounded-r-full" icon-name="resize" @function="makeScale" />
 					</template>
@@ -268,16 +349,6 @@ onBeforeUnmount(() => {
 							<CallbackBtn someClass="rounded-full" class="mt-2" text="Move model" icon-name="axis-arrow"
 								@function="changePos" />
 						</div>
-						<!-- <div class="border-t-2 border-sky-600 mt-3 pt-3">
-							<label>Rotate</label>
-							<div class="flex">
-								<CallbackBtn someClass="rounded-l-full" icon-name="phone-rotate-portrait"
-									@function="rotateLeft" />
-								<CallbackBtn someClass="rounded-r-full" icon-name="phone-rotate-landscape"
-									@function="rotateRight" />
-							</div>
-						</div>
-						<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div> -->
 					</template>
 				</ARTools>
 				<LoadIfcButton :loadFunction="loadIfcFile" />

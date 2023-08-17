@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import IfcThree from '../components/IfcThree.vue'
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import {
   MeshBasicMaterial,
   Mesh,
@@ -10,6 +11,12 @@ import {
   PCFShadowMap,
   // RGBAFormat,
   ACESFilmicToneMapping,
+  MeshPhongMaterial,  
+  Group,
+  PlaneHelper,
+  Plane,
+  Vector3,
+  DoubleSide,
 } from 'three';
 import { size, camera, cameraDolly } from '../helpers/Camera.js';
 import { scene } from '../helpers/configs/Scene.js';
@@ -43,10 +50,35 @@ export default {
     const modTransform = new ModelsTransform(ifcModels);
     const moveModels = modTransform.moveModels;
 
-    // Config the geometry     
-    const cubeGeometry = new BoxGeometry(1, 1, 1);
-    const cube = new Mesh(cubeGeometry, materials.whiteCeramicFloorMaterial);
+    const localPlane = new Plane( new Vector3( 0, - 1, 0 ), 1 );
+		const globalPlane = new Plane( new Vector3( - 1, 0, 0 ), 2 );
+		const globalPlane2 = new Plane( new Vector3( 0, -1, 0 ), 5 );
+		const globalPlane3 = new Plane( new Vector3( 0, 1, 0 ), 5 );
+
+    // const material = new MeshPhongMaterial( {
+    //     clippingPlanes: [ localPlane ],
+    //     clipShadows: true
+    // } );
+    // const clipHelpers = new Group();
+    // clipHelpers.add( new PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
+    // clipHelpers.add( new PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
+    // clipHelpers.add( new PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
+    // clipHelpers.visible = true;
+    const cubeMaterial = new MeshPhongMaterial( {
+			color: 0x80ee10,
+			shininess: 100,
+			side: DoubleSide,
+			// ***** Clipping setup (material): *****
+			clippingPlanes: [ localPlane ],
+			clipShadows: true
+		} );
+    // const cubeMaterial = materials.whiteCeramicFloorMaterial;
+    // cubeMaterial.clippingPlanes = clipPlanes;
+    const cubeGeometry = new BoxGeometry(2, 2, 2);
+    const cube = new Mesh(cubeGeometry, cubeMaterial);
     cube.position.set(0, 1, 0);
+
+    // scene.add(clipHelpers);
 
     // Load a ifc file
     const loadIfcFile = async (change) => {
@@ -98,6 +130,7 @@ export default {
         },
       });
 
+      
       // Config the renderer      
       const renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
       renderer.setSize(size.width, size.height);
@@ -107,13 +140,29 @@ export default {
       // renderer.outputColorSpace = RGBAFormat 
       renderer.toneMapping = ACESFilmicToneMapping
       renderer.toneMappingExposure = 1
+
+      
+      // ***** Clipping setup (renderer): *****
+			// const globalPlanes = [ globalPlane ],
+      // Empty = Object.freeze( [] );
+      renderer.clippingPlanes = [ globalPlane, globalPlane2, globalPlane3 ];
+			// renderer.clippingPlanes = Empty; // GUI sets it to globalPlanes
+			renderer.localClippingEnabled = true;
       
       scene.add(cube);
+
+      const dControl = new DragControls([cube], camera, canvas.value);
+      dControl.addEventListener('dragstart', function (event) {
+        event.object.material.opacity = 0.1;
+      });
+      dControl.addEventListener('dragend', function (event) {
+        event.object.material.opacity = 1;
+      });
 
       // function to move the cube in z in the scene pressing up and down arrow
       
 
-      cube.material = materials.concreteMaterial;
+      // cube.material = materials.concreteMaterial;
                   
       const outputId = document.getElementById('id-output');
 			const outputDesc = document.getElementById('desc-output');

@@ -77,29 +77,26 @@ let currentPath = computed(() => router.currentRoute.value.path);
 							@function="$emit('rotateRight')" />
 							<CallbackBtn someClass="" icon-name="water-opacity" @function="$emit('showTypes')" />
 							<CallbackBtn someClass="" icon-name="crop" @function="$emit('activeCrop')" />
-							<CallbackBtn someClass="rounded-r-full" icon-name="tape-measure" @function="$emit('starMeasure')" />
+							<CallbackBtn someClass="rounded-r-full" icon-name="tape-measure" @function="$emit('startMeasure')" />
 							</div>
 						</div>
 					<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div>
 				</div>
 
-				<button @click="openModelTools" class="hidden hover:-ml-4 w-full text-white hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3">
+				<!-- <button @click="openModelTools" class="hidden hover:-ml-4 w-full text-white hover:text-purple-500 dark:hover:text-blue-500 bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3">
 					<mdicon name="crop" />
 					<mdicon name="water-opacity" />
 					<mdicon name="tape-measure" />
 					<div> click </div>
-				</button>
-				<div v-if="isModelTools" class="overflow-y-auto">
+				</button> -->
+				<!-- <div v-if="isModelTools" class="overflow-y-auto">
 					<div class="border-b-2 border-sky-600 mt-1 pt-1 pb-1">
 						<label for="sectionBox">Tools</label>
 						<div class="flex">
-							<CallbackBtn someClass="rounded-l-full" icon-name="crop" @function="$emit('activeCrop')" />
-							<CallbackBtn someClass="" icon-name="tape-measure" @function="$emit('starMeasure')" />
-							<CallbackBtn someClass="rounded-r-full" icon-name="water-opacity" @function="$emit('showTypes')" />
 						</div>
 						<h1> En construcción ... </h1>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</aside>
 	</div>

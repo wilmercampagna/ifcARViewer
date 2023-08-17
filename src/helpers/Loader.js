@@ -1,4 +1,5 @@
 import { IFCLoader } from 'web-ifc-three/IFCLoader';
+
 import {
     acceleratedRaycast,
     computeBoundsTree,

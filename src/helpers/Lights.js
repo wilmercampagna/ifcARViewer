@@ -1,9 +1,9 @@
 import { AmbientLight, PointLight, SpotLight, DirectionalLight, HemisphereLight } from 'three';
 
 class Lights {
-    constructor(lightColor = 0xffffff) {   
+    constructor(lightColor = 0x404040) {   
         this.lightColor = lightColor;     
-        this.ambient = new AmbientLight(lightColor, 0.5);
+        this.ambient = new AmbientLight(lightColor, 0.1);
         this.pointLight = new PointLight({color: '#765CD6', intensity: 0.5, distance: 0 });
         this.pointLight.position.set( 0, 2, 0 );
         this.spotLight = new SpotLight( lightColor );

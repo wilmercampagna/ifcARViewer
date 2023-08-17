@@ -20,6 +20,8 @@ export default defineConfig({
     }),
     legacy({
       targets: ['defaults', 'not IE 11'],
+      polyfills: ['es.promise.finally', 'es/map', 'es/set'],
+      modernPolyfills: ['es.promise.finally'],
     }),
     VitePWA(
       {
@@ -143,4 +145,9 @@ export default defineConfig({
   //     comlink()
   //   ]
   // }
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    }
+  },
 })

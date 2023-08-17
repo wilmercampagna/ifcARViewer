@@ -162,6 +162,7 @@ const mod2Transform = new ModelsTransform(transparentSubsets, ifcClasses);
 const makeScale = () => {
 	modTransform.scaleModels(scaleFactor.value);
 	mod2Transform.scaleModels(scaleFactor.value);
+	scaleDragger();
 }
 const changePos = () => {
 	modTransform.moveModels(xPos.value, yPos.value, zPos.value);
@@ -256,11 +257,25 @@ onBeforeUnmount(() => {
 
 const clipPlanes = [];
 let draggerMesh;
+
+const scaleDragger = () => {
+	const sf1 = scaleFactor.value;
+	const sf2 = scaleFactor.value + 0.25;
+	ifcModels[0].scale.copy(new Vector3(sf1, sf1, sf1))
+	ifcModels[0].updateWorldMatrix();
+	const bounds = ifcModels[0].geometry.boundingBox;
+	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.2 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
+	draggerMesh.scale.copy(new Vector3(sf2, sf2, sf2))
+	draggerMesh.position.copy(initialDragPosition);
+	draggerMesh.updateWorldMatrix();
+	clipPlanes[0].constant = initialDragPosition.y;
+}
+
 const setupClippingPlanes = (renderer) => {
 	const bounds = ifcModels[0].geometry.boundingBox;
 
 	// Create draggable sphere at the center of bounds
-	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.8 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
+	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.2 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
 	const draggerGeometry = new ConeGeometry(0.5, 1, 4);
 	const draggerMaterial = new MeshPhongMaterial({
 		color: '#049ef4',

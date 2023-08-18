@@ -76,8 +76,8 @@ let currentPath = computed(() => router.currentRoute.value.path);
 							<CallbackBtn someClass="" icon-name="phone-rotate-landscape"
 							@function="$emit('rotateRight')" />
 							<CallbackBtn someClass="" icon-name="water-opacity" @function="$emit('showTypes')" />
-							<CallbackBtn someClass="" icon-name="crop" @function="$emit('activeCrop')" />
-							<CallbackBtn someClass="rounded-r-full" icon-name="tape-measure" @function="$emit('startMeasure')" />
+							<CallbackBtn someClass="rounded-r-full" icon-name="crop" @function="$emit('activeCrop')" />
+							<!-- <CallbackBtn someClass="rounded-r-full" icon-name="tape-measure" @function="$emit('startMeasure')" /> -->
 							</div>
 						</div>
 					<div class="border-t-2 border-sky-600 mt-3 pt-3 mb-28"></div>

@@ -41,9 +41,7 @@ let currentPath = computed(() => router.currentRoute.value.path);
 				<div class="flex space-x-3 items-center px-3">
 					<div class="flex-none flex justify-center">
 						<div class="w-8 h-8 flex ">
-							<img
-								src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShta_GXR2xdnsxSzj_GTcJHcNykjVKrCBrZ9qouUl0usuJWG2Rpr_PbTDu3sA9auNUH64&usqp=CAU"
-								alt="profile" class="shadow rounded-full object-cover" />
+							<mdicon name="account-heart" class="shadow rounded-full object-cover"></mdicon>
 						</div>
 					</div>
 					<div class="hidden md:block text-sm md:text-md text-black dark:text-white"> User</div>

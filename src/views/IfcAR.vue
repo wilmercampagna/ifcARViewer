@@ -1,17 +1,14 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
-	MeshPhongMaterial,
 	Mesh,
 	WebGLRenderer,
 	PCFShadowMap,
 	ACESFilmicToneMapping,
 	Vector3,
-	ConeGeometry,
 	Plane,
-	PointLight,
 } from 'three';
 import { size, camera, sceneAR } from '../helpers/configs/ARScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -23,7 +20,6 @@ import ARTools from '../components/ARTools.vue';
 import Counter from '../components/basics/Counter.vue';
 import CallbackBtn from '../components/basics/ARCallbackButton.vue';
 import IfcClassAR from '../components/IfcClassAR.vue';
-import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
 const canvas = ref(null);
 const ifcModels = [];
@@ -31,18 +27,18 @@ const scaleFactor = ref(0.5);
 const xPos = ref(0);
 const yPos = ref(0);
 const zPos = ref(0);
+const rangeMin = ref(0);
+const rangeMax = ref(10);
+const rangeValue = ref(5);
 const isTypeOpen = ref(false);
+const isCropOpen = ref(false);
 let renderer;
 let controls;
-let tcontrols1;
-let tcontrols2;
-let tcontrols3;
 
 setupIfcLoader(ifcLoader);
 const openType = () => isTypeOpen.value = !isTypeOpen.value;
-const tester = (el) => {
-	console.log('Any thing')
-}
+const openCrop = () => isCropOpen.value = !isCropOpen.value;
+
 
 const xdec = () => {
 	xPos.value -= 0.1;
@@ -86,6 +82,8 @@ const loadIfcFile = async (change) => {
 	if (ifcModels.length < 2) {
 		setupClippingPlanes(renderer)
 		turnClipping()
+		openCrop()
+		setupRangeSlider()
 	}
 };
 
@@ -121,7 +119,6 @@ const getIfcDataStructure = async (modelId) => {
 	})
 	return uniqueTypes;
 }
-
 
 // Gets the IDs of all the items of a specific category
 const getAll = async (category, modelId) => {
@@ -162,7 +159,6 @@ const mod2Transform = new ModelsTransform(transparentSubsets, ifcClasses);
 const makeScale = () => {
 	modTransform.scaleModels(scaleFactor.value);
 	mod2Transform.scaleModels(scaleFactor.value);
-	scaleDragger();
 }
 const changePos = () => {
 	modTransform.moveModels(xPos.value, yPos.value, zPos.value);
@@ -199,7 +195,6 @@ const makeTypesTransparent = (category) => {
 
 
 onMounted(() => {
-
 	// Config the renderer      
 	renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 	renderer.setSize(size.width, size.height);
@@ -256,89 +251,34 @@ onBeforeUnmount(() => {
 });
 
 const clipPlanes = [];
-let draggerMesh;
 
-const scaleDragger = () => {
-	const sf1 = scaleFactor.value;
-	const sf2 = scaleFactor.value + 0.25;
-	ifcModels[0].scale.copy(new Vector3(sf1, sf1, sf1))
-	ifcModels[0].updateWorldMatrix();
+const setupRangeSlider = () => {
 	const bounds = ifcModels[0].geometry.boundingBox;
-	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.2 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
-	draggerMesh.scale.copy(new Vector3(sf2, sf2, sf2))
-	draggerMesh.position.copy(initialDragPosition);
-	draggerMesh.updateWorldMatrix();
-	clipPlanes[0].constant = initialDragPosition.y;
+	rangeMin.value = bounds.min.y;
+	rangeMax.value = bounds.max.y;
 }
 
+watch(rangeValue, (newVal, oldVal) => clipPlanes[0].constant = newVal);
+
 const setupClippingPlanes = (renderer) => {
+	//Get a start point for the clipping plane
 	const bounds = ifcModels[0].geometry.boundingBox;
-
-	// Create draggable sphere at the center of bounds
-	const initialDragPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), 0.2 * (bounds.max.y), 0.5 * (bounds.max.z+bounds.min.z));
-	const draggerGeometry = new ConeGeometry(0.5, 1, 4);
-	const draggerMaterial = new MeshPhongMaterial({
-		color: '#049ef4',
-		emissive: '#049ef4',
-		shininess: 80,
-		reflectivity: 0.8,
-	});
-	const pLight = new PointLight({
-		color: '#4f53d8',
-		intensity: 1,
-		distance: 3,
-
-	})
-	pLight.position.copy(initialDragPosition);
-	draggerMesh = new Mesh(draggerGeometry, draggerMaterial);
-	draggerMesh.attach(pLight)
-	draggerMesh.position.copy(initialDragPosition);
-	draggerMesh.name = 'yDragger'
-	sceneAR.add(draggerMesh);
-
+	const initialPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), rangeValue.value, 0.5 * (bounds.max.z+bounds.min.z));
+	
 	// Prepare a clipping plane
 	const orientation = new Vector3(0, -1, 0);
 	const plane = new Plane();
-	let planePosition = new Vector3(initialDragPosition.x, initialDragPosition.y+1, initialDragPosition.z);
-	plane.setFromNormalAndCoplanarPoint(orientation, planePosition);
+	plane.setFromNormalAndCoplanarPoint(orientation, initialPosition);
 	clipPlanes.push(plane);
-	renderer.clippingPlanes = [plane];
-
-	// Handle drag events
-	const dControls = new DragControls([draggerMesh], camera, renderer.domElement);
-	dControls.addEventListener('drag', () => {
-		// Fix XZ-poistion
-		controls.enabled = false;
-		draggerMesh.position.set(initialDragPosition.x, draggerMesh.position.y, initialDragPosition.z);
-		draggerMesh.updateWorldMatrix();
-		// Update clipping plane
-		planePosition = new Vector3(draggerMesh.position.x, draggerMesh.position.y+1, draggerMesh.position.z);
-		plane.setFromNormalAndCoplanarPoint(new Vector3(0, -1, 0), planePosition);
-	});
-
-	dControls.addEventListener('dragend', () => {
-		controls.enabled = true;
-	});
-	// When we are hovering over a sphere we want to disable viewer dC	controls.addEventListener('hoveron', () => {
-	dControls.addEventListener('hoveron', () => {		
-  	camera.visible = false;
-  	draggerMaterial.color.set('#f14668');
-	});
-
-	// And turn them back on when we stop hovering over it
-	dControls.addEventListener('hoveroff', () => {		
-		camera.visible = true;
-		draggerMaterial.color.set('#049ef4');
-	});
+	renderer.clippingPlanes = [plane];	
 }
 
 const turnClipping = () => {
+	openCrop();
 	if (renderer.clippingPlanes.length > 0) {
 		renderer.clippingPlanes = [];
-		draggerMesh.visible = !draggerMesh.visible;
 	} else {
 		renderer.clippingPlanes = clipPlanes;
-		draggerMesh.visible = !draggerMesh.visible;
 	}
 }
 
@@ -349,7 +289,7 @@ const turnClipping = () => {
 		<div class="relative ">
 			<div class="pl-5 pr-5 pt-12 w-full absolute">
 				<ARTools @rotateLeft="rotateLeft" @rotateRight="rotateRight" @showTypes="openType" @activeCrop="turnClipping"
-					@startMeasure="turnClipping" v-model:scale="scaleFactor">
+					v-model:scale="scaleFactor">
 					<template v-slot:scaleBtn>
 						<CallbackBtn someClass="rounded-r-full" icon-name="resize" @function="makeScale" />
 					</template>
@@ -369,6 +309,13 @@ const turnClipping = () => {
 				<LoadIfcButton :loadFunction="loadIfcFile" />
 				<IfcClassAR @ifcClass="highLightType" @on-off="visibilizeTypes" @turnOpacity="makeTypesTransparent"
 					:ifc-classes="ifcClasses" v-if="isTypeOpen" />
+				<div v-if="isCropOpen" class="w-1/5 h-3/4 fixed left-14 top-24 bg-transparent">
+						<label for="default-range" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Crop plane</label>
+						<div class="w-fit -rotate-90 fixed -left-10 top-60">
+							<input id="default-range" type="range" :min="rangeMin" :max="rangeMax" v-model="rangeValue" step="0.1"								
+								class="w-60 h-2 rounded-lg appearance-none cursor-pointer bg-gradient-to-r from-indigo-800 to-indigo-300">
+						</div>
+				</div>
 				<div>
 
 				</div>

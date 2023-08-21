@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 
-import ARGuide from '../components/ARGuide.vue';
-import GameGuide from '../components/GameGuide.vue';
-import VRGuide from '../components/VRGuide.vue';
+import ARGuide from '../components/guides/ARGuide.vue';
+import GameGuide from '../components/guides/GameGuide.vue';
+import VRGuide from '../components/guides/VRGuide.vue';
 
 let ar = ref(false);
 let vr = ref(false);
@@ -53,9 +53,6 @@ const changeGame = () => {
 						<button class="px-2 sm:px-4">
 							<mdicon class="text-teal-500 dark:text-teal-400 hover:text-blue-500 hover:dark:text-yellow-500 " name="cube-scan"/> 
 						</button>
-						<button class="px-2 sm:px-4">
-							<mdicon class="text-blue-500 dark:text-yellow-500 hover:text-yellow-500 hover:dark:text-pink-500 " name="arrow-right-bottom-bold"/> 
-						</button>
 						<button @click="changeAR" class="px-2 sm:px-4">
 							<mdicon class="hover:text-blue-500 hover:dark:text-yellow-500 " name="augmented-reality"/>
 						</button>
@@ -78,12 +75,16 @@ const changeGame = () => {
 			<div>
 				<div class="flex sm:flex-col p-5 sm:font-semibold justify-center text-slate-600 dark:text-cyan-500 text-xs sm:text-md">
 					<p class="flex justify-center">
-						<span class="hidden sm:flex"> El módulo Ifc XR ha sido desarrollado por wilmercampagna </span>
+						<span class="hidden sm:flex"> El módulo Ifc AR ha sido desarrollado por wilmercampagna </span>
 						<img class="h-5 w-5 mr-2 ml-2" src="../assets/logo.png" alt="Logo" >
 					</p>
 					<p class="flex flex justify-center">
-						<span class="hidden sm:flex"> en colaboración con el grupo de investigación GRUA de la Universidad del Valle. </span>
+						<span class="hidden sm:flex"> en colaboración con el grupo de investigación GRUA  </span>
 						<img src="../assets/grua.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
+					</p>
+					<p class="flex flex justify-center">
+						<span class="hidden sm:flex"> de la Universidad del Valle. </span>
+						<img src="../assets/logoUV.jpg" alt="Logo" class="h-5  mr-2 ml-2">
 					</p>
 				</div>
 			</div>

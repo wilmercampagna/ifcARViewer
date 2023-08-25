@@ -78,63 +78,38 @@ export default {
 			renderer.xr.enabled = true;
 			const vrButton = new VRButton(renderer);
 
-			const getDevicePosition = () => {
-				if (controls.enable) {
-					controls.enable = false;
-				}	
-				if (renderer.xr.getSession()) {
-					const session = renderer.xr.getSession();
-					const refSpace = renderer.xr.getReferenceSpace();
-					let pose; 
-					session.requestAnimationFrame((time, frame) => {
-						// pose = frame.getViewerPose(refSpace);
-						pose = frame.getViewerPose(refSpace).views[0].transform.position;
-						if (pose) {						
-							// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-							// renderer.xr.getCamera().cameras[0].position.copy(newPosition)
-							renderer.xr.getCamera().cameras[0].position.x = pose.x;
-    					renderer.xr.getCamera().cameras[0].position.y = pose.y;
-    					renderer.xr.getCamera().cameras[0].position.z = pose.z;
-							// console.log(dolly.position)
-							// Get device position and transform the dolly position to it
-							// let xrCamera = renderer.xr.getCamera(camera);
-							// const saveQuat = xrCamera.quaternion.clone();
-							// var holder = new Quaternion()
-							// const devicePosition = new Vector3();
-							// xrCamera.getWorldQuaternion(holder);
-							// xrCamera.quaternion.copy(holder);
-							// xrCamera.getWorldPosition(devicePosition);
-							// dolly.position.set(
-							// 			pose.transform.position.x, 
-							// 			pose.transform.position.y,
-							// 			pose.transform.position.z)
-							// xrCamera.position.set(
-							// 			pose.transform.position.x, 
-							// 			pose.transform.position.y,
-							// 			pose.transform.position.z)
-							// xrCamera.quaternion.copy(saveQuat);
-						}
-					});
-				} 
-			}
+			// const getDevicePosition = () => {
+			// 	if (controls.enable) {
+			// 		controls.enable = false;
+			// 	}	
+			// 	if (renderer.xr.getSession()) {
+			// 		const session = renderer.xr.getSession();
+			// 		const refSpace = renderer.xr.getReferenceSpace();
+			// 		let pose; 
+			// 		session.requestAnimationFrame((time, frame) => {
+			// 			// pose = frame.getViewerPose(refSpace);
+			// 			pose = frame.getViewerPose(refSpace).views[0].transform.position;
+			// 			if (pose) {						
+			// 				// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
+			// 				// renderer.xr.getCamera().cameras[0].position.copy(newPosition)
+			// 				renderer.xr.getCamera().cameras[0].position.x = pose.x;
+    	// 				renderer.xr.getCamera().cameras[0].position.y = pose.y;
+    	// 				renderer.xr.getCamera().cameras[0].position.z = pose.z;
+			// 			}
+			// 		});
+			// 	} 
+			// }
 
 			function animate() {
-				// requestAnimationFrame(animate);
 				renderer.setAnimationLoop(render);
 			}
 
 			const clock = new Clock();
 			const render = () => {
-				getDevicePosition();
+				// getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }		
-				// if (genericController) { handleUserMovement(dt) }		
-				// controls.update();
-				if (renderer.xr.isPresenting) {
-					renderer.render(sceneVR, renderer.xr.getCamera().cameras[0]);
-				} else {
-					renderer.render(sceneVR, camera);
-				}
+				renderer.render(sceneVR, camera);
 			}
 
 			animate();
@@ -190,33 +165,33 @@ export default {
 			dolly.add(controllerGrip1);
 			dolly.add(controllerGrip2);
 
-			document.onkeydown = function(event) {
-         switch (event.keyCode) {
-            case 37:
-               console.log('Left key');
-            break;
-            case 38:
-							allowMovement;
-            break;
-            case 39:
-               console.log('Right key');
-            break;
-            case 40:
-							console.log('Down key');
-            break;
-         }
-      };
+			// document.onkeydown = function(event) {
+      //    switch (event.keyCode) {
+      //       case 37:
+      //          console.log('Left key');
+      //       break;
+      //       case 38:
+			// 				allowMovement;
+      //       break;
+      //       case 39:
+      //          console.log('Right key');
+      //       break;
+      //       case 40:
+			// 				console.log('Down key');
+      //       break;
+      //    }
+      // };
 
-			document.onkeyup = function(event) {
-				switch (event.keyCode) {
-					case 38:
-						allowMovement;
-					break;
-					case 40:
-						allowMovement;
-					break;
-				}
-			}
+			// document.onkeyup = function(event) {
+			// 	switch (event.keyCode) {
+			// 		case 38:
+			// 			allowMovement;
+			// 		break;
+			// 		case 40:
+			// 			allowMovement;
+			// 		break;
+			// 	}
+			// }
 
 			const messageBlock = document.getElementById("message-container");
 			let propMesh = new HTMLMesh(messageBlock);

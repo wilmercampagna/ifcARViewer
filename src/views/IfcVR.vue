@@ -78,27 +78,27 @@ export default {
 			renderer.xr.enabled = true;
 			const vrButton = new VRButton(renderer);
 
-			// const getDevicePosition = () => {
-			// 	if (controls.enable) {
-			// 		controls.enable = false;
-			// 	}	
-			// 	if (renderer.xr.getSession()) {
-			// 		const session = renderer.xr.getSession();
-			// 		const refSpace = renderer.xr.getReferenceSpace();
-			// 		let pose; 
-			// 		session.requestAnimationFrame((time, frame) => {
-			// 			// pose = frame.getViewerPose(refSpace);
-			// 			pose = frame.getViewerPose(refSpace).views[0].transform.position;
-			// 			if (pose) {						
-			// 				// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-			// 				// renderer.xr.getCamera().cameras[0].position.copy(newPosition)
-			// 				renderer.xr.getCamera().cameras[0].position.x = pose.x;
-    	// 				renderer.xr.getCamera().cameras[0].position.y = pose.y;
-    	// 				renderer.xr.getCamera().cameras[0].position.z = pose.z;
-			// 			}
-			// 		});
-			// 	} 
-			// }
+			const getDevicePosition = () => {
+				if (controls.enable) {
+					controls.enable = false;
+				}	
+				if (renderer.xr.getSession()) {
+					const session = renderer.xr.getSession();
+					const refSpace = renderer.xr.getReferenceSpace();
+					let pose; 
+					session.requestAnimationFrame((time, frame) => {
+						// pose = frame.getViewerPose(refSpace);
+						pose = frame.getViewerPose(refSpace).views[0].transform.position;
+						if (pose) {						
+							// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
+							renderer.xr.getCamera().cameras[0].position.copy(pose)
+							// renderer.xr.getCamera().cameras[0].position.x = pose.x;
+    					// renderer.xr.getCamera().cameras[0].position.y = pose.y;
+    					// renderer.xr.getCamera().cameras[0].position.z = pose.z;
+						}
+					});
+				} 
+			}
 
 			function animate() {
 				renderer.setAnimationLoop(render);
@@ -106,7 +106,7 @@ export default {
 
 			const clock = new Clock();
 			const render = () => {
-				// getDevicePosition();
+				getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }		
 				renderer.render(sceneVR, camera);

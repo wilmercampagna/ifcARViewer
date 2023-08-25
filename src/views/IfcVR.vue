@@ -95,7 +95,6 @@ export default {
 							renderer.xr.getCamera().cameras[0].position.x = pose.x;
     					renderer.xr.getCamera().cameras[0].position.y = pose.y;
     					renderer.xr.getCamera().cameras[0].position.z = pose.z;
-							// dolly.position.copy(newPosition)
 							// console.log(dolly.position)
 							// Get device position and transform the dolly position to it
 							// let xrCamera = renderer.xr.getCamera(camera);
@@ -131,16 +130,12 @@ export default {
 				if (controller1) { handleUserMovement(dt) }		
 				// if (genericController) { handleUserMovement(dt) }		
 				// controls.update();
-				renderer.render(sceneVR, camera);
+				if (renderer.xr.isPresenting) {
+					renderer.render(sceneVR, renderer.xr.getCamera().cameras[0]);
+				} else {
+					renderer.render(sceneVR, camera);
+				}
 			}
-
-			// let genericController = renderer.xr.getController(2);
-			// genericController.addEventListener('click', allowMovement)
-			// 	// call to handleUserMovement and pass in the render function with dt
-			// 	// handleUserMovement(render, dt)
-
-			// });
-
 
 			animate();
 			Resizer(size, renderer, camera);
@@ -154,7 +149,7 @@ export default {
 			controller1.addEventListener('squeezestart', pick);
 			controller1.addEventListener('squeezeend', hideDetails);
 			controller1.addEventListener('selectstart', allowMovement);
-			controller1.addEventListener('selectend', stopMovement);
+			controller1.addEventListener('selectend', allowMovement);
 
 			//One can set controller 2 to perform another function on 'select' - currently both set to object picking
 			controller2 = renderer.xr.getController(1);
@@ -194,6 +189,34 @@ export default {
 			dolly.add(controller2);
 			dolly.add(controllerGrip1);
 			dolly.add(controllerGrip2);
+
+			document.onkeydown = function(event) {
+         switch (event.keyCode) {
+            case 37:
+               console.log('Left key');
+            break;
+            case 38:
+							allowMovement;
+            break;
+            case 39:
+               console.log('Right key');
+            break;
+            case 40:
+							console.log('Down key');
+            break;
+         }
+      };
+
+			document.onkeyup = function(event) {
+				switch (event.keyCode) {
+					case 38:
+						allowMovement;
+					break;
+					case 40:
+						allowMovement;
+					break;
+				}
+			}
 
 			const messageBlock = document.getElementById("message-container");
 			let propMesh = new HTMLMesh(messageBlock);
@@ -324,9 +347,9 @@ export default {
 			}
 
 			//Functions to handle user movement around scene (3 of the 6 DoF)
-			var letUserMove = false
-			function allowMovement() { letUserMove = true }
-			function stopMovement() { letUserMove = false }
+			let letUserMove = false
+			function allowMovement() { letUserMove = !letUserMove }
+			// function stopMovement() { letUserMove = false }
 			function handleUserMovement(dt) {
 				if (letUserMove) {
 					const speed = 2;

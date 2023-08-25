@@ -78,64 +78,34 @@ export default {
 			renderer.xr.enabled = true;
 			const vrButton = new VRButton(renderer);
 
-			
-
-			// Getting the device position
-			// renderer.xr.addEventListener('sessionstart', () => {
-			// 	if (renderer.xr.getSession()) {
-			// 		const session = renderer.xr.getSession();
-			// 		const refSpace = renderer.xr.getReferenceSpace();
-			// 		let pose = session.requestAnimationFrame((time, frame) => {
-			// 			pose = frame.getViewerPose(refSpace);
-			// 			if (pose) {
-			// 				Get device position and transform the dolly position to it
-			// 				let xrCamera = renderer.xr.getCamera(camera);
-			// 				const saveQuat = xrCamera.quaternion.clone();
-			// 				var holder = new Quaternion()
-			// 				const devicePosition = new Vector3();
-			// 				xrCamera.getWorldQuaternion(holder);
-			// 				xrCamera.quaternion.copy(holder);
-			// 				xrCamera.getWorldPosition(devicePosition);
-			// 				xrCamera.quaternion.copy(saveQuat);
-			// 				console.log(devicePosition)
-			// 				console.log(xrCamera.position)
-
-			// 				console.log(pose.transform.position)
-			// 				console.log(renderer.xr.getCamera().position)
-			// 				pose.transform.position.copy(devicePosition);
-			// 				// dummy.getWorldQuaternion(holder)
-			// 				// dolly.quaternion.copy(holder);
-			// 				// dolly.translateZ(moveZ);
-			// 				// dolly.quaternion.copy(saveQuat)
-			// 			}
-			// 		});
-			// 	}
-			// });
-
 			const getDevicePosition = () => {
-				if (renderer.xr.getSession() && !renderer.xr.getController(0)) {
+				if (renderer.xr.getSession()) {
 					const session = renderer.xr.getSession();
 					const refSpace = renderer.xr.getReferenceSpace();
-					let pose = session.requestAnimationFrame((time, frame) => {
+					let pose; 
+					session.requestAnimationFrame((time, frame) => {
 						pose = frame.getViewerPose(refSpace);
-						if (pose) {
+						if (pose) {						
+							const newPosition = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
+							dolly.position.copy(newPosition)
+							// console.log(dolly.position)
 							// Get device position and transform the dolly position to it
-							let xrCamera = renderer.xr.getCamera(camera);
-							const saveQuat = xrCamera.quaternion.clone();
-							var holder = new Quaternion()
-							const devicePosition = new Vector3();
-							xrCamera.getWorldQuaternion(holder);
-							xrCamera.quaternion.copy(holder);
-							xrCamera.getWorldPosition(devicePosition);
-							dolly.position.set(
-										pose.transform.position.x, 
-										pose.transform.position.y,
-										pose.transform.position.z)
-							xrCamera.position.set(
-										pose.transform.position.x, 
-										pose.transform.position.y,
-										pose.transform.position.z)
-							xrCamera.quaternion.copy(saveQuat);
+							// let xrCamera = renderer.xr.getCamera(camera);
+							// const saveQuat = xrCamera.quaternion.clone();
+							// var holder = new Quaternion()
+							// const devicePosition = new Vector3();
+							// xrCamera.getWorldQuaternion(holder);
+							// xrCamera.quaternion.copy(holder);
+							// xrCamera.getWorldPosition(devicePosition);
+							// dolly.position.set(
+							// 			pose.transform.position.x, 
+							// 			pose.transform.position.y,
+							// 			pose.transform.position.z)
+							// xrCamera.position.set(
+							// 			pose.transform.position.x, 
+							// 			pose.transform.position.y,
+							// 			pose.transform.position.z)
+							// xrCamera.quaternion.copy(saveQuat);
 						}
 					});
 				} 
@@ -151,13 +121,13 @@ export default {
 				getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }		
-				if (genericController) { handleUserMovement(dt) }		
+				// if (genericController) { handleUserMovement(dt) }		
 				controls.update();
 				renderer.render(sceneVR, camera);
 			}
 
-			let genericController = renderer.xr.getController(2);
-			genericController.addEventListener('click', allowMovement)
+			// let genericController = renderer.xr.getController(2);
+			// genericController.addEventListener('click', allowMovement)
 			// 	// call to handleUserMovement and pass in the render function with dt
 			// 	// handleUserMovement(render, dt)
 
@@ -173,10 +143,10 @@ export default {
 
 			//VR Controllers 
 			controller1 = renderer.xr.getController(0);
-			controller1.addEventListener('selectstart', pick);
-			controller1.addEventListener('selectend', hideDetails);
-			controller1.addEventListener('squeezestart', allowMovement);
-			controller1.addEventListener('squeezeend', stopMovement);
+			controller1.addEventListener('squeezestart', pick);
+			controller1.addEventListener('squeezeend', hideDetails);
+			controller1.addEventListener('selectstart', allowMovement);
+			controller1.addEventListener('selectend', stopMovement);
 
 			//One can set controller 2 to perform another function on 'select' - currently both set to object picking
 			controller2 = renderer.xr.getController(1);
@@ -203,6 +173,8 @@ export default {
 
 			controller1.add(line.clone());
 			controller2.add(line.clone());
+
+			// console.log(controller1)
 
 			sceneVR.add(controller1);
 			sceneVR.add(controller2);

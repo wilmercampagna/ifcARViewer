@@ -91,7 +91,7 @@ export default {
 						pose = frame.getViewerPose(refSpace).views[0].transform.position;
 						if (pose) {						
 							// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-							renderer.xr.getCamera().cameras[0].position.copy(pose)
+							// renderer.xr.getCamera().cameras[0].position.copy(pose)
 							// renderer.xr.getCamera().cameras[0].position.x = pose.x;
     					// renderer.xr.getCamera().cameras[0].position.y = pose.y;
     					// renderer.xr.getCamera().cameras[0].position.z = pose.z;

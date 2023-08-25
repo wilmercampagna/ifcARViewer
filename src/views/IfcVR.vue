@@ -87,14 +87,31 @@ export default {
 					const refSpace = renderer.xr.getReferenceSpace();
 					let pose; 
 					session.requestAnimationFrame((time, frame) => {
-						// pose = frame.getViewerPose(refSpace);
-						pose = frame.getViewerPose(refSpace).views[0].transform.position;
+						pose = frame.getViewerPose(refSpace);
 						if (pose) {						
-							// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-							// renderer.xr.getCamera().cameras[0].position.copy(pose)
-							// renderer.xr.getCamera().cameras[0].position.x = pose.x;
-    					// renderer.xr.getCamera().cameras[0].position.y = pose.y;
-    					// renderer.xr.getCamera().cameras[0].position.z = pose.z;
+							const newPosition = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
+							// console.log(renderer.xr.getCamera())
+							renderer.xr.getCamera().cameras[0].position.copy(newPosition)
+							// console.log(renderer.xr.getCamera().cameras[0].position)
+							// dolly.position.copy(newPosition)
+							// console.log(dolly.position)
+							// Get device position and transform the dolly position to it
+							// let xrCamera = renderer.xr.getCamera(camera);
+							// const saveQuat = xrCamera.quaternion.clone();
+							// var holder = new Quaternion()
+							// const devicePosition = new Vector3();
+							// xrCamera.getWorldQuaternion(holder);
+							// xrCamera.quaternion.copy(holder);
+							// xrCamera.getWorldPosition(devicePosition);
+							// dolly.position.set(
+							// 			pose.transform.position.x, 
+							// 			pose.transform.position.y,
+							// 			pose.transform.position.z)
+							// xrCamera.position.set(
+							// 			pose.transform.position.x, 
+							// 			pose.transform.position.y,
+							// 			pose.transform.position.z)
+							// xrCamera.quaternion.copy(saveQuat);
 						}
 					});
 				} 
@@ -124,7 +141,7 @@ export default {
 			controller1.addEventListener('squeezestart', pick);
 			controller1.addEventListener('squeezeend', hideDetails);
 			controller1.addEventListener('selectstart', allowMovement);
-			controller1.addEventListener('selectend', allowMovement);
+			controller1.addEventListener('selectend', stopMovement);
 
 			//One can set controller 2 to perform another function on 'select' - currently both set to object picking
 			controller2 = renderer.xr.getController(1);
@@ -323,8 +340,8 @@ export default {
 
 			//Functions to handle user movement around scene (3 of the 6 DoF)
 			let letUserMove = false
-			function allowMovement() { letUserMove = !letUserMove }
-			// function stopMovement() { letUserMove = false }
+			function allowMovement() { letUserMove = true }
+			function stopMovement() { letUserMove = false }
 			function handleUserMovement(dt) {
 				if (letUserMove) {
 					const speed = 2;

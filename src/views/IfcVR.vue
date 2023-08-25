@@ -87,12 +87,14 @@ export default {
 					const refSpace = renderer.xr.getReferenceSpace();
 					let pose; 
 					session.requestAnimationFrame((time, frame) => {
-						pose = frame.getViewerPose(refSpace);
+						// pose = frame.getViewerPose(refSpace);
+						pose = frame.getViewerPose(refSpace).views[0].transform.position;
 						if (pose) {						
-							const newPosition = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-							console.log(renderer.xr.getCamera())
-							renderer.xr.getCamera().cameras[0].position.copy(newPosition)
-							console.log(renderer.xr.getCamera().cameras[0].position)
+							// const newPos = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
+							// renderer.xr.getCamera().cameras[0].position.copy(newPosition)
+							renderer.xr.getCamera().cameras[0].position.x = pose.x;
+    					renderer.xr.getCamera().cameras[0].position.y = pose.y;
+    					renderer.xr.getCamera().cameras[0].position.z = pose.z;
 							// dolly.position.copy(newPosition)
 							// console.log(dolly.position)
 							// Get device position and transform the dolly position to it

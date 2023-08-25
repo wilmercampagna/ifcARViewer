@@ -61,7 +61,7 @@ class VRButton{
 
             session.addEventListener( 'end', onSessionEnded );
 
-            self.renderer.xr.setReferenceSpaceType( 'local' );
+            // self.renderer.xr.setReferenceSpaceType( 'local' );
             self.renderer.xr.setSession( session );
             self.stylizeElement( button, false, 12, true );
             // session.requestReferenceSpace("viewer").then((refSpace)=>{

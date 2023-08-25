@@ -79,6 +79,9 @@ export default {
 			const vrButton = new VRButton(renderer);
 
 			const getDevicePosition = () => {
+				if (controls.enable) {
+					controls.enable = false;
+				}	
 				if (renderer.xr.getSession()) {
 					const session = renderer.xr.getSession();
 					const refSpace = renderer.xr.getReferenceSpace();
@@ -87,7 +90,10 @@ export default {
 						pose = frame.getViewerPose(refSpace);
 						if (pose) {						
 							const newPosition = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z)
-							dolly.position.copy(newPosition)
+							console.log(renderer.xr.getCamera())
+							renderer.xr.getCamera().cameras[0].position.copy(newPosition)
+							console.log(renderer.xr.getCamera().cameras[0].position)
+							// dolly.position.copy(newPosition)
 							// console.log(dolly.position)
 							// Get device position and transform the dolly position to it
 							// let xrCamera = renderer.xr.getCamera(camera);
@@ -122,7 +128,7 @@ export default {
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }		
 				// if (genericController) { handleUserMovement(dt) }		
-				controls.update();
+				// controls.update();
 				renderer.render(sceneVR, camera);
 			}
 

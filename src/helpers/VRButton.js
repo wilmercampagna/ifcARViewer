@@ -61,7 +61,7 @@ class VRButton{
 
             session.addEventListener( 'end', onSessionEnded );
 
-            // self.renderer.xr.setReferenceSpaceType( 'unbounded' );
+            self.renderer.xr.setReferenceSpaceType( 'local-floor' );
             self.renderer.xr.setSession( session );
             self.stylizeElement( button, false, 12, true );
             

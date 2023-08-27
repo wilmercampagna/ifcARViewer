@@ -61,39 +61,9 @@ class VRButton{
 
             session.addEventListener( 'end', onSessionEnded );
 
-            // self.renderer.xr.setReferenceSpaceType( 'local' );
+            // self.renderer.xr.setReferenceSpaceType( 'unbounded' );
             self.renderer.xr.setSession( session );
             self.stylizeElement( button, false, 12, true );
-            // session.requestReferenceSpace("viewer").then((refSpace)=>{
-            //     console.log(refSpace)
-            //     session.requestAnimationFrame((time, frame)=>{
-            //         const myviewerPose = frame.getViewerPose(refSpace)
-            //         console.log(myviewerPose)
-            //     });
-            //     // session.requestHitTestSource({space: refSpace}).then((hitTestSource)=>{ console.log(hitTestSource) });
-            //     // const viewerPose = session.getViewerPose(refSpace);
-            //     // console.log(viewerPose)
-            // });
-            // refSpace.then((refSpace)=> {
-            //     console.log(refSpace)
-            //     const viwerPose = actualSession.getViewerPose(refSpace);
-            //     console.log(viwerPose)
-            // })            
-            // console.log(refSpace)
-            // .then((refSpace)=>{
-            //     console.log(refSpace)
-            //     actualSession.requestHitTestSource({space: refSpace}).then((hitTestSource)=>{
-            //         console.log(hitTestSource)
-            //         actualSession.requestAnimationFrame((time, frame)=>{
-            //             console.log(frame)
-            //             const results = frame.getHitTestResults(hitTestSource);
-            //             console.log(results)
-            //         })
-            //         .then((viewerPose)=>{
-            //             console.log(viewerPose)
-            //         })  
-            //     });           
-            // })
             
             button.textContent = 'EXIT VR';
 
@@ -148,7 +118,7 @@ class VRButton{
                 // ('local' is always available for immersive sessions and doesn't need to
                 // be requested separately.)
 
-                var sessionInit = { requiredFeatures: [ 'viewer' ], optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+                var sessionInit = { requiredFeatures: [ 'viewer' ], optionalFeatures: [ 'local-floor', 'bounded-floor', 'unbounded' ] };
                 navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
             } else {

@@ -27,6 +27,7 @@ import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerM
 import { CanvasUI } from '../helpers/CanvasUI.js';
 import { MousePick } from '../helpers/MousePicker.js';
 import Materials from '../helpers/Materials.js';
+import skyBox from '../helpers/skybox.js';
 
 export default {
 	name: 'IfcVR',
@@ -37,6 +38,7 @@ export default {
 		const canvas = ref(null);
 		const ifcModels = [];
 		setupIfcLoader(ifcLoader);
+		sceneVR.add(skyBox)
 
 		const materials = new Materials();
 		const lambMaterial = new MeshLambertMaterial({ transparent: true, opacity: 0.1, color: 0x77aaff });
@@ -62,10 +64,12 @@ export default {
 			renderer.useLegacyLights = true
 			// renderer.outputColorSpace = RGBAFormat 
 			renderer.toneMapping = ACESFilmicToneMapping
-			renderer.toneMappingExposure = 1
+			renderer.toneMappingExposure = 1		
 
 			const controls = Controls(camera, renderer);
-			controls.enableDamping = true;
+			// controls.enableDamping = true;
+			controls.minDistance = 1;
+			controls.maxDistance = 1500;
 			controls.update();
 
 			// Config the mouse picker
@@ -126,7 +130,6 @@ export default {
 
 			const clock = new Clock();
 			const render = () => {
-				// getDevicePosition();
 				const dt = clock.getDelta();
 				if (controller1) { handleUserMovement(dt) }		
 				renderer.render(sceneVR, camera);
@@ -141,10 +144,10 @@ export default {
 
 			//VR Controllers 
 			controller1 = renderer.xr.getController(0);
-			controller1.addEventListener('squeezestart', pick);
-			controller1.addEventListener('squeezeend', hideDetails);
-			controller1.addEventListener('selectstart', allowMovement);
-			controller1.addEventListener('selectend', stopMovement);
+			controller1.addEventListener('selectstart', pick);
+			controller1.addEventListener('selectend', hideDetails);
+			controller1.addEventListener('squeezestart', allowMovement);
+			controller1.addEventListener('squeezeend', stopMovement);
 
 			//One can set controller 2 to perform another function on 'select' - currently both set to object picking
 			controller2 = renderer.xr.getController(1);
@@ -186,8 +189,8 @@ export default {
 			dolly.add(controllerGrip2);
 
 			document.addEventListener('keydown', (event) =>  {
-				console.log(event.key)
-				console.log(event.keyCode)
+				// console.log(event.key)
+				// console.log(event.keyCode)
 				if (event.key === 'MediaPlayPause') {
 					allowMovementPhone();
 				}
@@ -326,11 +329,11 @@ export default {
 			function allowMovementPhone() { 
 				letUserMove = !letUserMove
 			}
-			function allowMovement() { letUserMove = false }
+			function allowMovement() { letUserMove = true }
 			function stopMovement() { letUserMove = false }
 			function handleUserMovement(dt) {
 				if (letUserMove) {
-					const speed = 2;
+					const speed = 1;
 					const moveZ = -dt * speed
 					const saveQuat = dolly.quaternion.clone();
 					var holder = new Quaternion()

@@ -20,7 +20,7 @@ const size = {
 
 //Creates the camera (point of view of the user)
 const aspect = size.width / size.height;
-const camera = new PerspectiveCamera(70, aspect, 0.01, 500);
+const camera = new PerspectiveCamera(70, aspect, 0.1, 1000);
 //Create a 3D object to carry the camera around XR session
 const cameraDolly = new Object3D();
 const dummyCam = new Object3D();

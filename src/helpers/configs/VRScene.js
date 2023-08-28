@@ -6,7 +6,7 @@ import { Camera } from '../Camera.js';
 //Creates grids and axes in the scene
 const ax = new Axes(50, 50);
 const lights = new Lights();
-const cam = new Camera(75, 0.01, 500);
+const cam = new Camera(75, 0.1, 10000);
 const size = cam.size;
 
 //Creates the camera (point of view of the user)

@@ -182,6 +182,18 @@ export default {
 			dolly.add(controllerGrip1);
 			dolly.add(controllerGrip2);
 
+			document.onkeydown = function(event) {
+				if (event.key === 'Enter') {
+					allowMovementPhone();
+				} 
+				// else if (event.key === 'ArrowDown') {
+				// 	allowMovement();
+				// } else if (event.key === 'ArrowLeft') {
+				// 	allowMovement();
+				// } else if (event.key === 'ArrowRight') {
+				// 	allowMovement();
+				// }
+			}
 			// document.onkeydown = function(event) {
       //    switch (event.keyCode) {
       //       case 37:
@@ -340,7 +352,10 @@ export default {
 
 			//Functions to handle user movement around scene (3 of the 6 DoF)
 			let letUserMove = false
-			function allowMovement() { letUserMove = true }
+			function allowMovementPhone() { 
+				letUserMove = !letUserMove
+			}
+			function allowMovement() { letUserMove = false }
 			function stopMovement() { letUserMove = false }
 			function handleUserMovement(dt) {
 				if (letUserMove) {

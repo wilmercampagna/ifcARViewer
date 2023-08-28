@@ -20,7 +20,8 @@ import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.
 import Resizer from '../helpers/Resizer.js';
 import { ifcLoader, setupIfcLoader } from '../helpers/Loader.js';
 import Controls from '../helpers/Controls.js';
-import { VRButton } from '../helpers/VRButton.js';
+// import { VRButton } from '../helpers/VRButton.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { CanvasUI } from '../helpers/CanvasUI.js';
@@ -76,7 +77,9 @@ export default {
 
 			// Config the VR button
 			renderer.xr.enabled = true;
-			const vrButton = new VRButton(renderer);
+			// const vrButton = new VRButton(renderer);
+
+			document.body.appendChild( VRButton.createButton( renderer ) );
 
 			const getDevicePosition = () => {
 				if (controls.enable) {
@@ -182,46 +185,14 @@ export default {
 			dolly.add(controllerGrip1);
 			dolly.add(controllerGrip2);
 
-			document.onkeydown = function(event) {
-				if (event.key === 'Enter') {
+			document.addEventListener('keydown', (event) =>  {
+				console.log(event.key)
+				console.log(event.keyCode)
+				if (event.key === 'MediaPlayPause') {
 					allowMovementPhone();
-				} 
-				// else if (event.key === 'ArrowDown') {
-				// 	allowMovement();
-				// } else if (event.key === 'ArrowLeft') {
-				// 	allowMovement();
-				// } else if (event.key === 'ArrowRight') {
-				// 	allowMovement();
-				// }
-			}
-			// document.onkeydown = function(event) {
-      //    switch (event.keyCode) {
-      //       case 37:
-      //          console.log('Left key');
-      //       break;
-      //       case 38:
-			// 				allowMovement;
-      //       break;
-      //       case 39:
-      //          console.log('Right key');
-      //       break;
-      //       case 40:
-			// 				console.log('Down key');
-      //       break;
-      //    }
-      // };
-
-			// document.onkeyup = function(event) {
-			// 	switch (event.keyCode) {
-			// 		case 38:
-			// 			allowMovement;
-			// 		break;
-			// 		case 40:
-			// 			allowMovement;
-			// 		break;
-			// 	}
-			// }
-
+				}
+			})
+			
 			const messageBlock = document.getElementById("message-container");
 			let propMesh = new HTMLMesh(messageBlock);
 			let raycaster = new Raycaster();

@@ -15,6 +15,7 @@ import {
 	PCFShadowMap,
  	 // RGBAFormat,
   	ACESFilmicToneMapping,
+PolyhedronGeometry,
 } from 'three';
 import { size, camera, dolly, dummy, sceneVR } from '../helpers/configs/VRScene.js';
 import Resizer from '../helpers/Resizer.js';
@@ -325,6 +326,7 @@ export default {
 			}
 
 			//Functions to handle user movement around scene (3 of the 6 DoF)
+			const origin = new Vector3();
 			let letUserMove = false
 			function allowMovementPhone() { 
 				letUserMove = !letUserMove
@@ -333,13 +335,71 @@ export default {
 			function stopMovement() { letUserMove = false }
 			function handleUserMovement(dt) {
 				if (letUserMove) {
+					const wallLimit = 1;
 					const speed = 1;
-					const moveZ = -dt * speed
+					let pos = dolly.position.clone();
+					pos.y += 1;
+
+					let dir = new Vector3();
+					// Save the dolly's quaternion
 					const saveQuat = dolly.quaternion.clone();
-					var holder = new Quaternion()
-					dummy.getWorldQuaternion(holder)
-					dolly.quaternion.copy(holder);
-					dolly.translateZ(moveZ);
+					// Save the rotation for movement from the headset position
+					let holder = new Quaternion()
+					dolly.quaternion.copy( dummy.getWorldQuaternion(holder) );
+					dolly.getWorldDirection(dir);
+        	dir.negate();
+					raycaster.set(pos, dir);
+
+					let blocked = false;
+
+					let intersect = raycaster.intersectObjects(ifcModels);
+					if (intersect.length > 0) {
+						if (intersect[0].distance < wallLimit) {
+							blocked = true;
+						}
+					}
+					if (!blocked) {
+						dolly.translateZ(-dt * speed);
+						pos = dolly.getWorldPosition(origin)
+					}
+
+					//cast left
+					dir.set(-1,0,0);
+        	dir.applyMatrix4(dolly.matrix);
+        	dir.normalize();
+        	raycaster.set(pos, dir);
+
+        	intersect = raycaster.intersectObjects(ifcModels);
+        	if (intersect.length>0){
+        	    if (intersect[0].distance<wallLimit) dolly.translateX(wallLimit-intersect[0].distance);
+        	}
+
+        	//cast right
+        	dir.set(1,0,0);
+        	dir.applyMatrix4(dolly.matrix);
+        	dir.normalize();
+        	raycaster.set(pos, dir);
+
+        	intersect = raycaster.intersectObjects(ifcModels);
+        	if (intersect.length>0){
+        	    if (intersect[0].distance<wallLimit) dolly.translateX(intersect[0].distance-wallLimit);
+        	}
+
+        	//cast down
+        	dir.set(0,-1,0);
+        	pos.y += 1.5;
+        	raycaster.set(pos, dir);
+				
+        	intersect = raycaster.intersectObjects(ifcModels);
+        	if (intersect.length>0){
+        	    dolly.position.copy( intersect[0].point );
+        	}
+
+					// const moveZ = -dt * speed
+					// var holder = new Quaternion()
+					// dummy.getWorldQuaternion(holder)
+					// dolly.quaternion.copy(holder);
+					// dolly.translateZ(moveZ);
 					dolly.quaternion.copy(saveQuat)
 				}
 			}

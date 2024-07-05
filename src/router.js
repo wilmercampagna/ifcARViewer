@@ -1,15 +1,13 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import IfcAR from './views/IfcAR.vue';
-import IfcVR from './views/IfcVR.vue';
-import IfcGame from './views/IfcGame.vue';
 
 const routes = [
     {
         meta: {
-            title: "Ifc4All"
+            title: "IfcARViewer"
         },
         path: "/",
-        name: "Ifc4All",
+        name: "IfcARViewer",
         component: () => import(/* webpackChunkName: "Home" */ './views/Home.vue')
         // component: HomeView,
     },
@@ -20,22 +18,6 @@ const routes = [
         path: "/ifcAR",
         name: "IfcAR",
         component: IfcAR,
-    },
-    {
-        meta: {
-            title: "ifc VR"
-        },
-        path: "/ifcVR",
-        name: "VR",
-        component: IfcVR,
-    },
-    {
-        meta: {
-            title: "ifc Game"
-        },
-        path: "/ifcGame",
-        name: "Game",
-        component: IfcGame,
     }
 ];
 

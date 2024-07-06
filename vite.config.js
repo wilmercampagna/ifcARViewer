@@ -7,7 +7,7 @@ import glsl from 'vite-plugin-glsl';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "https://wilmercampagna.github.io/ifcUV",
+  base: "/ifcARViewer/",
   plugins: [
     // comlink(),
     vue(),

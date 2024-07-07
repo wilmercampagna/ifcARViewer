@@ -82,9 +82,9 @@ export default defineConfig({
       },
       manifest:
         {
-          "name": "ifc4all",
-          "id": "/ifc4all/",
-          "short_name": "ifc4all",
+          "name": "ifcAR",
+          "id": "/ifcAR/",
+          "short_name": "ifcARl",
           "start_url": ".",
           "background_color": "#ffffff",
           "theme_color": "#ffffff",
@@ -118,7 +118,7 @@ export default defineConfig({
               "purpose": "any"
             }
           ],
-          "description": "Ifc4all es una iniciativa open source, en la que es espera desarrollar una serie de herramientas que tomen como base archivos ifc",
+          "description": " ifc AR viewer es una aplicación web que permite cargar archivos ifc y visualizarlos en 3D y en realidad aumentada. Esta visualización puede ser realizada desde un navegador en dispositivos móviles como celulares o tablets",
           "orientation": "portrait-primary",
           "dir": "auto",
           "lang": "en-US",

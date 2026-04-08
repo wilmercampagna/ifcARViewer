@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "@vue/cli-plugin-pwa": "^5.0.8",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.26",
     "tailwindcss": "^3.3.3",

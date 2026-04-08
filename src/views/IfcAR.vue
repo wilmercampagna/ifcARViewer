@@ -69,21 +69,26 @@ const ifcClasses = [];
 const transparentColor = new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: 0x77aaff });
 
 const loadIfcFile = async (change) => {
-	const modelName = change.target.files[0].name;
-	const ifcURL = URL.createObjectURL(change.target.files[0]);
-	// const ifcModel = ifcLoader.load(ifcURL);
-	const ifcModel = await ifcLoader.loadAsync(ifcURL);
-	ifcModel.name = modelName;
-	const modelId = ifcModel.modelID;
-	ifcModels.push(ifcModel);
-	// sceneAR.add(ifcModel)
-	await getAllSpatialTypes(modelId, ifcLoader);
-	setupAllCategories(modelId);
-	if (ifcModels.length < 2) {
-		setupClippingPlanes(renderer)
-		turnClipping()
-		openCrop()
-		setupRangeSlider()
+	const file = change.target.files[0];
+	if (!file) return;
+	try {
+		const modelName = file.name;
+		const ifcURL = URL.createObjectURL(file);
+		const ifcModel = await ifcLoader.loadAsync(ifcURL);
+		ifcModel.name = modelName;
+		const modelId = ifcModel.modelID;
+		ifcModels.push(ifcModel);
+		await getAllSpatialTypes(modelId, ifcLoader);
+		setupAllCategories(modelId);
+		if (ifcModels.length < 2) {
+			setupClippingPlanes(renderer);
+			turnClipping();
+			openCrop();
+			setupRangeSlider();
+		}
+		URL.revokeObjectURL(ifcURL);
+	} catch (error) {
+		alert('Error al cargar el archivo IFC. Verifica que el archivo sea válido.');
 	}
 };
 
@@ -175,8 +180,6 @@ const rotateRight = () => {
 
 const highLightType = (category) => {
 	const subset = subsets[category.typeName];
-	console.log(subset)
-	console.log(transparentSubsets)
 }
 
 const visibilizeTypes = (category) => {
@@ -198,12 +201,10 @@ onMounted(() => {
 	// Config the renderer      
 	renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 	renderer.setSize(size.width, size.height);
-	renderer.setSize(size.width, size.height);
-	renderer.shadowMap.enabled = true
-	renderer.shadowMap.type = PCFShadowMap
-	renderer.useLegacyLights = true
-	renderer.toneMapping = ACESFilmicToneMapping
-	renderer.toneMappingExposure = 1
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = PCFShadowMap;
+	renderer.toneMapping = ACESFilmicToneMapping;
+	renderer.toneMappingExposure = 1;
 
 	// Clipping Planes
 	// renderer.clippingPlanes = [];
@@ -247,7 +248,12 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
 	const arBtn = document.getElementById('ARButton');
-	document.body.removeChild(arBtn);
+	if (arBtn) {
+		document.body.removeChild(arBtn);
+	}
+	if (renderer) {
+		renderer.dispose();
+	}
 });
 
 const clipPlanes = [];

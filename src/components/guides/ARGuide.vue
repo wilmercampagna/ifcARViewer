@@ -32,7 +32,7 @@
 				</div>
 				<div class="pt-6">
 					<h2 class="text-2xl text-teal-500 dark:text-sky-400 font-semibold">
-						Compatilidad
+						Compatibilidad
 					</h2>
 					<div>
 						<h2 class="text-xl pt-4 text-teal-500 dark:text-sky-400 font-semibold">
@@ -70,8 +70,8 @@
 				<div class="pt-6">
 					<h2 class="text-xl md:text-2xl text-teal-500 dark:text-sky-400 font-semibold">Mira el video tutorial de uso</h2>
 					<div class="flex justify-center pt-4">
-						<iframe class="w-3/4 aspect-video" src="https://www.youtube.com/watch?v=wyR4NRAEXdw" 
-							frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope" 
+						<iframe class="w-3/4 aspect-video" src="https://www.youtube.com/embed/wyR4NRAEXdw"
+							frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope"
 							allowfullscreen></iframe>
 					</div>
 				</div>

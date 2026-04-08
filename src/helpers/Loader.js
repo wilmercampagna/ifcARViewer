@@ -7,8 +7,10 @@ import {
 } from 'three-mesh-bvh';
 
 const loadModelProgress = (xhr) => {
-    const percentComplete = (xhr.loaded / xhr.total) * 100;
-    console.log(Math.round(percentComplete, 2) + '% loaded');
+    if (import.meta.env.DEV) {
+        const percentComplete = (xhr.loaded / xhr.total) * 100;
+        console.log(Math.round(percentComplete, 2) + '% loaded');
+    }
 };
 
 const ifcLoader = new IFCLoader();

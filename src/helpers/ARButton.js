@@ -102,21 +102,22 @@ class ARButton{
         button.style.right = '20px';
         button.style.width = '80px';
         button.style.cursor = 'pointer';
-        button.innerHTML = '<i class="fas fa-camera"></i>';
-        
+        button.textContent = 'AR';
+        button.style.fontSize = '16px';
+        button.style.fontWeight = 'bold';
 
         button.onmouseenter = function () {
-            
-            button.style.fontSize = '12px'; 
+
+            button.style.fontSize = '12px';
             button.textContent = (currentSession===null) ? 'START AR' : 'STOP AR';
             button.style.opacity = '1.0';
 
         };
 
         button.onmouseleave = function () {
-            
-            button.style.fontSize = '30px'; 
-            button.innerHTML = '<i class="fas fa-camera"></i>';
+
+            button.style.fontSize = '16px';
+            button.textContent = 'AR';
             button.style.opacity = '0.5';
 
         };

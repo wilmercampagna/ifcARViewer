@@ -1,12 +1,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import LoadIfcButton from '../components/LoadIfcButton.vue';
 import {
 	MeshLambertMaterial,
-	Mesh,
 	WebGLRenderer,
-	PCFShadowMap,
-	ACESFilmicToneMapping,
 	Vector3,
 	Plane,
 } from 'three';
@@ -34,11 +32,19 @@ const isTypeOpen = ref(false);
 const isCropOpen = ref(false);
 let renderer;
 let controls;
+let cleanupResizer;
+
+// Dirty flags for render loop optimization
+let scaleDirty = false;
+let posDirty = false;
 
 setupIfcLoader(ifcLoader);
 const openType = () => isTypeOpen.value = !isTypeOpen.value;
 const openCrop = () => isCropOpen.value = !isCropOpen.value;
 
+// Watchers to set dirty flags instead of updating every frame
+watch(scaleFactor, () => { scaleDirty = true; });
+watch([xPos, yPos, zPos], () => { posDirty = true; });
 
 const xdec = () => {
 	xPos.value -= 0.1;
@@ -66,14 +72,16 @@ const zinc = () => {
 };
 
 const ifcClasses = [];
-const transparentColor = new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: 0x77aaff });
+const ifcClassNames = new Set();
+const transparentMat = new MeshLambertMaterial({ transparent: true, opacity: 0.2, color: 0x77aaff });
 
 const loadIfcFile = async (change) => {
 	const file = change.target.files[0];
 	if (!file) return;
+	let ifcURL;
 	try {
 		const modelName = file.name;
-		const ifcURL = URL.createObjectURL(file);
+		ifcURL = URL.createObjectURL(file);
 		const ifcModel = await ifcLoader.loadAsync(ifcURL);
 		ifcModel.name = modelName;
 		const modelId = ifcModel.modelID;
@@ -86,43 +94,36 @@ const loadIfcFile = async (change) => {
 			openCrop();
 			setupRangeSlider();
 		}
-		URL.revokeObjectURL(ifcURL);
 	} catch (error) {
 		alert('Error al cargar el archivo IFC. Verifica que el archivo sea válido.');
+	} finally {
+		if (ifcURL) URL.revokeObjectURL(ifcURL);
 	}
 };
 
 const getAllSpatialTypes = async (modelId, ifcLoader) => {
-	// const modelTypes = await ifcLoader.ifcManager.getAllItemsOfType(modelId);
 	const modelTypes = await ifcLoader.ifcManager.types.state.api.GetAllTypesOfModel(modelId);
-	const ifcModelClass = await getIfcDataStructure(modelId);
-	const objectTypes = []
-	modelTypes.filter(el => {
-		const isDuplicate = ifcModelClass.includes(el.typeName);
-		if (isDuplicate) {
-			objectTypes.push(el);
+	const ifcModelClassSet = new Set(await getIfcDataStructure(modelId));
+	const objectTypes = modelTypes.filter(el => ifcModelClassSet.has(el.typeName));
+	// Deduplicate before adding
+	objectTypes.forEach(ot => {
+		if (!ifcClassNames.has(ot.typeName)) {
+			ifcClassNames.add(ot.typeName);
+			ifcClasses.push(ot);
 		}
-	})
-	ifcClasses.push(...objectTypes);
+	});
 	return objectTypes;
 }
 
 const getIfcDataStructure = async (modelId) => {
 	const ifcData = await ifcLoader.ifcManager.getSpatialStructure(modelId);
 	const elements = ifcData.children[0].children[0].children;
-	let elType = []
+	const typeSet = new Set();
 	for (let i = 0; i < elements.length; i++) {
-		const element = elements[i].children;
-		elType.push(...element)
+		const children = elements[i].children;
+		children.forEach(el => typeSet.add(el.type));
 	}
-	const uniqueTypes = []
-	const unique = elType.filter(el => {
-		const isDuplicate = uniqueTypes.includes(el.type);
-		if (!isDuplicate) {
-			uniqueTypes.push(el.type);
-		}
-	})
-	return uniqueTypes;
+	return [...typeSet];
 }
 
 // Gets the IDs of all the items of a specific category
@@ -143,39 +144,31 @@ async function newSubsetOfType(category, modelId) {
 	});
 }
 
-// Stores the created subsets
+// Stores the created subsets and their original materials
 const subsets = {};
-const transparentSubsets = {};
+const originalMaterials = {};
 
 async function setupAllCategories(modelId) {
 	for (let i = 0; i < ifcClasses.length; i++) {
 		const category = ifcClasses[i];
 		subsets[category.typeName] = await newSubsetOfType(category, modelId);
-		const subsetCopy = new Mesh(subsets[category.typeName].geometry, transparentColor);
-		transparentSubsets[category.typeName] = subsetCopy;
-		// subsets[category.typeName].initialMaterial = subsets[category.typeName].material;
+		originalMaterials[category.typeName] = subsets[category.typeName].material;
 		sceneAR.add(subsets[category.typeName]);
-		sceneAR.add(transparentSubsets[category.typeName]);
 	}
 }
 
 const modTransform = new ModelsTransform(subsets, ifcClasses);
-const mod2Transform = new ModelsTransform(transparentSubsets, ifcClasses);
 const makeScale = () => {
 	modTransform.scaleModels(scaleFactor.value);
-	mod2Transform.scaleModels(scaleFactor.value);
 }
 const changePos = () => {
 	modTransform.moveModels(xPos.value, yPos.value, zPos.value);
-	mod2Transform.moveModels(xPos.value, yPos.value, zPos.value);
 }
 const rotateLeft = () => {
 	modTransform.rotateModels(Math.PI / 32);
-	mod2Transform.rotateModels(Math.PI / 32);
 }
 const rotateRight = () => {
 	modTransform.rotateModels(-Math.PI / 32);
-	mod2Transform.rotateModels(-Math.PI / 32);
 }
 
 const highLightType = (category) => {
@@ -184,31 +177,28 @@ const highLightType = (category) => {
 
 const visibilizeTypes = (category) => {
 	const subset = subsets[category.typeName];
-	const subsetCopy = transparentSubsets[category.typeName]
 	subset.visible = !subset.visible;
-	subsetCopy.visible = subset.visible;
 }
 
 const makeTypesTransparent = (category) => {
 	const subset = subsets[category.typeName];
-	const subsetCopy = transparentSubsets[category.typeName]
-	subset.visible = !subset.visible;
-	subsetCopy.visible = !subset.visible;
+	if (subset.material === transparentMat) {
+		subset.material = originalMaterials[category.typeName];
+	} else {
+		subset.material = transparentMat;
+	}
 }
 
 
 onMounted(() => {
-	// Config the renderer      
+	// Config the renderer
 	renderer = new WebGLRenderer({ antialias: true, canvas: canvas.value, alpha: true });
 	renderer.setSize(size.width, size.height);
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = PCFShadowMap;
-	renderer.toneMapping = ACESFilmicToneMapping;
-	renderer.toneMappingExposure = 1;
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+	renderer.shadowMap.enabled = false;
 
 	// Clipping Planes
-	// renderer.clippingPlanes = [];
-	renderer.localClippingEnabled = true;	
+	renderer.localClippingEnabled = true;
 
 	const bgContainer = document.getElementById('bgContainer');
 	renderer.xr.addEventListener('sessionstart', () => {
@@ -229,31 +219,56 @@ onMounted(() => {
 	document.body.appendChild(arButton);
 
 	function animate() {
-		// requestAnimationFrame(animate);
 		renderer.setAnimationLoop(render);
-		// renderer.render(sceneAR, camera);
 	}
 
 	function render() {
 		if (renderer.xr.getSession()) {
-			makeScale();
-			changePos();
+			if (scaleDirty) { makeScale(); scaleDirty = false; }
+			if (posDirty) { changePos(); posDirty = false; }
 		}
 		renderer.render(sceneAR, camera);
 	}
 	animate();
-	Resizer(size, renderer, camera);
+	cleanupResizer = Resizer(size, renderer, camera);
 	return { canvas, renderer, controls }
 })
 
 onBeforeUnmount(() => {
+	// Remove AR button
 	const arBtn = document.getElementById('ARButton');
-	if (arBtn) {
-		document.body.removeChild(arBtn);
+	if (arBtn) document.body.removeChild(arBtn);
+
+	// End XR session if active
+	const session = renderer?.xr?.getSession();
+	if (session) session.end();
+
+	// Dispose all subsets
+	for (const key in subsets) {
+		const mesh = subsets[key];
+		if (mesh.geometry) mesh.geometry.dispose();
+		if (mesh.material && mesh.material !== transparentMat) {
+			if (Array.isArray(mesh.material)) mesh.material.forEach(m => m.dispose());
+			else mesh.material.dispose();
+		}
+		sceneAR.remove(mesh);
 	}
+	transparentMat.dispose();
+
+	// Dispose controls and resize listener
+	if (controls) controls.dispose();
+	if (cleanupResizer) cleanupResizer();
+
+	// Dispose renderer
 	if (renderer) {
+		renderer.setAnimationLoop(null);
 		renderer.dispose();
 	}
+
+	// Clear arrays
+	ifcModels.length = 0;
+	ifcClasses.length = 0;
+	ifcClassNames.clear();
 });
 
 const clipPlanes = [];
@@ -264,19 +279,22 @@ const setupRangeSlider = () => {
 	rangeMax.value = bounds.max.y;
 }
 
-watch(rangeValue, (newVal, oldVal) => clipPlanes[0].constant = newVal);
+const updateClipPlane = useDebounceFn((newVal) => {
+	if (clipPlanes[0]) clipPlanes[0].constant = newVal;
+}, 16);
+watch(rangeValue, updateClipPlane);
 
 const setupClippingPlanes = (renderer) => {
 	//Get a start point for the clipping plane
 	const bounds = ifcModels[0].geometry.boundingBox;
 	const initialPosition = new Vector3(0.5 * (bounds.max.x+bounds.min.x), rangeValue.value, 0.5 * (bounds.max.z+bounds.min.z));
-	
+
 	// Prepare a clipping plane
 	const orientation = new Vector3(0, -1, 0);
 	const plane = new Plane();
 	plane.setFromNormalAndCoplanarPoint(orientation, initialPosition);
 	clipPlanes.push(plane);
-	renderer.clippingPlanes = [plane];	
+	renderer.clippingPlanes = [plane];
 }
 
 const turnClipping = () => {
@@ -318,7 +336,7 @@ const turnClipping = () => {
 				<div v-if="isCropOpen" class="w-1/5 h-3/4 fixed left-14 top-24 bg-transparent">
 						<label for="default-range" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Crop plane</label>
 						<div class="w-fit -rotate-90 fixed -left-10 top-60">
-							<input id="default-range" type="range" :min="rangeMin" :max="rangeMax" v-model="rangeValue" step="0.1"								
+							<input id="default-range" type="range" :min="rangeMin" :max="rangeMax" v-model="rangeValue" step="0.1"
 								class="w-60 h-2 rounded-lg appearance-none cursor-pointer bg-gradient-to-r from-indigo-800 to-indigo-300">
 						</div>
 				</div>

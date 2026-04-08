@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import IfcAR from './views/IfcAR.vue';
 
 const routes = [
     {
@@ -8,8 +7,7 @@ const routes = [
         },
         path: "/",
         name: "IfcARViewer",
-        component: () => import(/* webpackChunkName: "Home" */ './views/Home.vue')
-        // component: HomeView,
+        component: () => import('./views/Home.vue'),
     },
     {
         meta: {
@@ -17,7 +15,7 @@ const routes = [
         },
         path: "/ifcAR",
         name: "IfcAR",
-        component: IfcAR,
+        component: () => import('./views/IfcAR.vue'),
     }
 ];
 

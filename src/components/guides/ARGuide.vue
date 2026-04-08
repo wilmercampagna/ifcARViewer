@@ -1,80 +1,165 @@
-<script>
-
+<script setup>
 </script>
 
 <template>
-	<div class="m-2 p-2 md:p-8 text-xs md:text-base">
-		<div>
-			<h1 class="text-3xl text-teal-500 dark:text-sky-400 font-semibold">
-				Guía de uso ifcAR
+	<div class="rounded-2xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm
+		border border-slate-200 dark:border-slate-700 p-6 md:p-10">
+
+		<!-- Header -->
+		<div class="flex items-center gap-3 mb-8">
+			<div class="w-10 h-10 rounded-xl flex items-center justify-center
+				bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+				<mdicon name="augmented-reality" class="text-xl" />
+			</div>
+			<h1 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
+				Guia de uso ifcAR
 			</h1>
-			<div>
-				<div class="py-2">
-					<div class="flex p-5 sm:font-semibold justify-center text-slate-600 dark:text-cyan-500 text-xs sm:text-md">
-						<p class="flex justify-center">
-							<span class="hidden sm:flex">@wilmercampagna </span>
-							<img class="h-5 w-5 mr-2 ml-2" src="../../assets/logo.png" alt="Logo">
-						</p>
-						<p class="flex flex justify-center">
-							<span class="hidden sm:flex"> Grupo de investigación GRUA </span>
-							<img src="../../assets/grua.png" alt="Logo" class="h-5 w-5 mr-2 ml-2">
-						</p>
-						<p class="flex flex justify-center">
-							<span class="hidden sm:flex"> Universidad del Valle. </span>
-							<img src="../../assets/logoUV.jpg" alt="Logo" class="h-5  mr-2 ml-2">
-						</p>
-					</div>
+		</div>
+
+		<!-- Description -->
+		<p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-10 text-sm md:text-base">
+			ifcAR permite cargar modelos IFC y proyectarlos en sesiones de realidad aumentada,
+			sobreponiendo objetos virtuales sobre el plano fisico. Visualiza modelos BIM
+			a traves de las camaras de tu dispositivo movil.
+		</p>
+
+		<!-- Steps Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
+			<!-- Step 1: Go to AR -->
+			<div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40">
+				<div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+					bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-cyan-400
+					text-sm font-bold">
+					1
 				</div>
-				<div class="text-justify">
-					<p >
-						IfcAR es una aplicación que permite cargar modelos ifc y proyectarlos en sesiones de realidad aumentada, sobreponiendo objectos virtuales sobre el plano físico. Estos objetos virtuales se pueden visualizar a través de dispositivos móviles mostrando el plano físico a través de las cámaras y en pantalla los modelos ifc. 
+				<div>
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-1">Ir a ifcAR</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						Presiona el boton
+						<router-link to="/ifcAR"
+							class="inline-flex items-center gap-1 text-blue-600 dark:text-cyan-400
+								hover:underline font-medium">
+							Iniciar AR <mdicon name="augmented-reality" class="text-sm" />
+						</router-link>
+						o navega desde el menu.
 					</p>
 				</div>
-				<div class="pt-6">
-					<h2 class="text-2xl text-teal-500 dark:text-sky-400 font-semibold">
-						Compatibilidad
-					</h2>
+			</div>
+
+			<!-- Step 2: Load file -->
+			<div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40">
+				<div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+					bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-cyan-400
+					text-sm font-bold">
+					2
+				</div>
+				<div>
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-1">Cargar modelo IFC</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						Arrastra o selecciona un archivo <code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-600 text-xs">.ifc</code>
+						desde tu dispositivo.
+					</p>
+				</div>
+			</div>
+
+			<!-- Step 3: Tools -->
+			<div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40">
+				<div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+					bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-cyan-400
+					text-sm font-bold">
+					3
+				</div>
+				<div>
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-1">Usar herramientas</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						Despliega el panel lateral para escalar, rotar, mover el modelo y gestionar categorias IFC.
+					</p>
+				</div>
+			</div>
+
+			<!-- Step 4: Start AR -->
+			<div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40">
+				<div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+					bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-cyan-400
+					text-sm font-bold">
+					4
+				</div>
+				<div>
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-1">Iniciar sesion AR</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						Presiona el boton START AR para proyectar el modelo sobre el entorno fisico a traves de la camara.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Compatibility Section -->
+		<div class="mb-10">
+			<h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+				<mdicon name="phone-rotate-portrait" class="text-blue-600 dark:text-cyan-400" />
+				Compatibilidad
+			</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-600">
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-2">Android</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400 mb-2">
+						Requiere un dispositivo compatible con Google AR Services y navegador Chrome.
+					</p>
+					<a href="https://developers.google.com/ar/devices?hl=es-419" target="_blank"
+						class="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-cyan-400
+							hover:underline font-medium">
+						Ver dispositivos compatibles
+					</a>
+				</div>
+				<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-600">
+					<h3 class="font-semibold text-slate-800 dark:text-white mb-2">iOS</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400 mb-2">
+						Requiere la aplicacion WebXR Viewer disponible en la App Store.
+					</p>
+					<a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056" target="_blank"
+						class="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-cyan-400
+							hover:underline font-medium">
+						Descargar WebXR Viewer
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Resources Section -->
+		<div class="mb-10">
+			<h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4">
+				Recursos
+			</h2>
+			<div class="flex flex-col sm:flex-row gap-4">
+				<a href="https://drive.google.com/file/d/16hcD7iIvILecr0616TbzO3cIxcwy0trZ/view?usp=sharing"
+					target="_blank"
+					class="flex items-center gap-3 p-4 rounded-xl
+						border border-slate-200 dark:border-slate-600
+						hover:border-blue-400 dark:hover:border-cyan-500
+						hover:shadow-md transition-all duration-300 group">
+					<div class="w-10 h-10 rounded-lg flex items-center justify-center
+						bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
+						group-hover:scale-110 transition-transform">
+						<mdicon name="floor-plan" />
+					</div>
 					<div>
-						<h2 class="text-xl pt-4 text-teal-500 dark:text-sky-400 font-semibold">
-							Android
-						</h2>
-						<a class="hover:text-blue-500 hover:dark:text-yellow-500 pt-4"
-							href="https://developers.google.com/ar/devices?hl=es-419" target="_blank">
-							Dispositivos compatibles</a>
-						<h2 class="text-xl pt-4 text-teal-500 dark:text-sky-400 font-semibold">
-							IOS
-						</h2>
-						<a class="hover:text-blue-500 hover:dark:text-yellow-500 pt-4"
-							href="https://apps.apple.com/us/app/webxr-viewer/id1295998056" target="_blank">
-							Descargar WebXR</a>
+						<p class="font-medium text-slate-800 dark:text-white text-sm">Manual de usuario</p>
+						<p class="text-xs text-slate-500 dark:text-slate-400">Guia completa en PDF</p>
 					</div>
-				</div>
-				<div class="pt-6">
-					<h2 class="text-xl md:text-2xl text-teal-500 dark:text-sky-400 font-semibold">Ir a ifcAR</h2>
-					<router-link to="/ifcAR"
-						class="text-sky-500 mt-4 flex text-white hover:text-purple-500 bg-transparent
-							dark:hover:text-blue-500">Ir a  
-						<mdicon name="augmented-reality" class="text-2xl" />
-					</router-link>
-					<p class="pt-2">O presiona sobre el logo de ifc4All</p>
-					<p class="pt-2">Luego despliega el panel clicando el boton circular que aparece</p>
-					<p class="pt-2">Clic en apps</p>
-					<p class="pt-2">Clic Ifc AR</p>
-				</div>
-				<div class="pt-6">
-					<h2 class="text-xl md:text-2xl text-teal-500 dark:text-sky-400 font-semibold">Enlace a la Guía de usuario completa en versión pdf</h2>
-					<a class="pt-6 hover:text-blue-500 hover:dark:text-yellow-500 "
-							href="https://drive.google.com/file/d/16hcD7iIvILecr0616TbzO3cIxcwy0trZ/view?usp=sharing" target="_blank">
-							Manual de usuario</a>
-				</div>
-				<div class="pt-6">
-					<h2 class="text-xl md:text-2xl text-teal-500 dark:text-sky-400 font-semibold">Mira el video tutorial de uso</h2>
-					<div class="flex justify-center pt-4">
-						<iframe class="w-3/4 aspect-video" src="https://www.youtube.com/embed/wyR4NRAEXdw"
-							frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope"
-							allowfullscreen></iframe>
-					</div>
-				</div>
+				</a>
+			</div>
+		</div>
+
+		<!-- Video Tutorial -->
+		<div>
+			<h2 class="text-xl font-bold text-slate-800 dark:text-white mb-4">
+				Video tutorial
+			</h2>
+			<div class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600">
+				<iframe class="w-full aspect-video" src="https://www.youtube.com/embed/wyR4NRAEXdw"
+					frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope"
+					allowfullscreen loading="lazy"></iframe>
 			</div>
 		</div>
 	</div>

@@ -1,32 +1,23 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
-import legacy from '@vitejs/plugin-legacy'
 import glsl from 'vite-plugin-glsl';
-// import { comlink } from 'vite-plugin-comlink' // To use with web workers
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/ifcARViewer/",
   plugins: [
-    // comlink(),
     vue(),
     glsl({
-      include: [                   // Glob pattern, or array of glob patterns to import
+      include: [
         '**/*.glsl', '**/*.wgsl',
         '**/*.vert', '**/*.frag',
         '**/*.vs', '**/*.fs'
       ],
     }),
-    legacy({
-      targets: ['defaults', 'not IE 11'],
-      polyfills: ['es.promise.finally', 'es/map', 'es/set'],
-      modernPolyfills: ['es.promise.finally'],
-    }),
     VitePWA(
       {
       registerType: "autoUpdate",
-      // injectRegister: 'auto',      
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
         clientsClaim: true,
@@ -36,12 +27,12 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 30
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -50,12 +41,12 @@ export default defineConfig({
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'gstatic-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 30
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -84,7 +75,7 @@ export default defineConfig({
         {
           "name": "ifcAR",
           "id": "/ifcAR/",
-          "short_name": "ifcARl",
+          "short_name": "ifcAR",
           "start_url": ".",
           "background_color": "#ffffff",
           "theme_color": "#ffffff",
@@ -118,10 +109,10 @@ export default defineConfig({
               "purpose": "any"
             }
           ],
-          "description": " ifc AR viewer es una aplicación web que permite cargar archivos ifc y visualizarlos en 3D y en realidad aumentada. Esta visualización puede ser realizada desde un navegador en dispositivos móviles como celulares o tablets",
+          "description": "ifcAR Viewer es una aplicación web que permite cargar archivos IFC y visualizarlos en 3D y en realidad aumentada.",
           "orientation": "portrait-primary",
           "dir": "auto",
-          "lang": "en-US",
+          "lang": "es",
           "categories": [
             "education",
             "navigation",
@@ -140,14 +131,15 @@ export default defineConfig({
       }
     ),
   ],
-  // worker: {
-  //   plugins: [
-  //     comlink()
-  //   ]
-  // }
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-core': ['three'],
+          'ifc-engine': ['web-ifc-three'],
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+        }
+      }
     }
   },
 })

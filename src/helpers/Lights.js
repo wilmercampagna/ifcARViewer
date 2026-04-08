@@ -1,8 +1,8 @@
 import { AmbientLight, PointLight, SpotLight, DirectionalLight, HemisphereLight } from 'three';
 
 class Lights {
-    constructor(lightColor = 0x404040) {   
-        this.lightColor = lightColor;     
+    constructor(lightColor = 0x404040) {
+        this.lightColor = lightColor;
         this.ambient = new AmbientLight(lightColor, 0.1);
         this.pointLight = new PointLight({color: '#765CD6', intensity: 0.5, distance: 0 });
         this.pointLight.position.set( 0, 2, 0 );
@@ -16,7 +16,13 @@ class Lights {
         this.ambient.add(this.hemisphere);
         this.ambient.add(this.pointLight);
         this.ambient.add(this.spotLight);
-        this.ambient.add(this.directionalLight); 
+        this.ambient.add(this.directionalLight);
+    }
+
+    static createForAR() {
+        const ambient = new AmbientLight(0x404040, 0.5);
+        const hemi = new HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
+        return { ambient, hemi };
     }
 }
 

@@ -1,37 +1,45 @@
 <script setup>
-import { ref } from 'vue'
-import { useDark } from '@vueuse/core'
-import { useStore } from '../store/index.js'
+import { useDark, useToggle } from '@vueuse/core'
 
 const isDark = useDark()
-const isActiveSide = ref(true);
-
-const store = useStore();
-const openIfcData = store.changeShowIfcData;
-
+const toggleDark = useToggle(isDark)
 </script>
 
 <template>
-	<div class="">
-		<div class="fixed w-full z-30 flex bg-transparent p-2 items-center justify-center h-16 px-5">
-			<!-- <div class="fixed w-full z-30 flex bg-white dark:bg-[#0F172A] p-2 items-center justify-center h-16 px-10"> -->
-			<div
-				class="logo dark:text-white  transform ease-in-out duration-500 flex-none h-full flex items-center justify-center"
-				:class="isActiveSide ? 'ml-12' : ''">
-				<router-link to="/">
-					<img class="block h-6 md:h-8 w-auto " src="../assets/logo.png" alt="ifc4All logo">
-				</router-link>
-				<div>
-					<router-link class="ml-5" to="/ifcAR"> Go AR </router-link>
-				</div>
-			</div>
+	<nav class="fixed w-full top-0 z-30 h-14
+		bg-transparent backdrop-blur-sm">
+		<div class="max-w-6xl mx-auto h-full px-4 flex items-center justify-between">
+			<!-- Logo & Brand -->
+			<router-link to="/" class="flex items-center gap-2 group">
+				<img src="../assets/logo.png" alt="ifcAR"
+					class="h-7 w-7 group-hover:scale-110 transition-transform duration-300" />
+				<span class="text-sm font-bold text-slate-800 dark:text-white tracking-tight hidden sm:inline">
+					ifcAR Viewer
+				</span>
+			</router-link>
 
-			<!-- SPACER -->
-			<div class="grow h-full flex items-center justify-center"></div>
-			<div class="flex-none h-full text-center flex items-center justify-center">
+			<!-- Nav Links -->
+			<div class="flex items-center gap-2">
+				<router-link to="/ifcAR"
+					class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium
+						bg-gradient-to-r from-blue-600 to-cyan-500 text-white
+						hover:shadow-lg hover:shadow-blue-500/30
+						hover:scale-105 transition-all duration-300">
+					<mdicon name="augmented-reality" class="text-base" />
+					<span class="hidden sm:inline">Go AR</span>
+				</router-link>
+
+				<!-- Dark Mode Toggle -->
+				<button @click="toggleDark()"
+					class="w-9 h-9 rounded-full flex items-center justify-center
+						text-slate-600 dark:text-slate-300
+						hover:bg-slate-100 dark:hover:bg-slate-800
+						transition-colors duration-200"
+					:title="isDark ? 'Modo claro' : 'Modo oscuro'">
+					<mdicon v-if="isDark" name="weather-sunny" class="text-lg" />
+					<mdicon v-else name="weather-night" class="text-lg" />
+				</button>
 			</div>
 		</div>
-	</div>
+	</nav>
 </template>
-
-    

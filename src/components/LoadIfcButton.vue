@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-    <div class="flex justify-center items-center text-cyan-600 font-semibold">     
+    <div class="flex justify-center items-center text-cyan-600 font-semibold z-40 relative">
           <div class="w-full sm:w-1/2 md:w-1/4">
             <label for="file-input" class="flex flex-col items-center justify-center w-full h-fit hover:text-pink-500 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-opacity-30 hover:bg-opacity-100 bg-gray-50 dark:bg-opacity-30 dark:hover:bg-opacity-100 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
                 <div class="flex flex-row items-center justify-center pt-1 ">

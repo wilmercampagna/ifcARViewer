@@ -152,7 +152,7 @@ const toggleGuide = () => showGuide.value = !showGuide.value;
 					</a>
 					<div class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
 						<img src="../assets/grua.png" alt="GRUA" class="h-8 w-8" />
-						<span class="text-sm font-medium hidden sm:inline">Grupo GRUA</span>
+						<span class="text-sm font-medium hidden sm:inline">GRUA - Grupo de Investigación en construcción</span>
 					</div>
 					<div class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
 						<img src="../assets/logoUV.jpg" alt="Universidad del Valle" class="h-8" />

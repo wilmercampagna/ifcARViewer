@@ -30,6 +30,7 @@ const rangeMax = ref(10);
 const rangeValue = ref(5);
 const isTypeOpen = ref(false);
 const isCropOpen = ref(false);
+const isInAR = ref(false);
 let renderer;
 let controls;
 let cleanupResizer;
@@ -201,10 +202,20 @@ onMounted(() => {
 	renderer.localClippingEnabled = true;
 
 	const bgContainer = document.getElementById('bgContainer');
+	const navBar = document.querySelector('nav');
 	renderer.xr.addEventListener('sessionstart', () => {
 		bgContainer.classList.remove('bg-gradient-to-t', 'from-blue-100', 'via-blue-100',
 			'to-blue-200', 'dark:from-slate-900', 'dark:via-slate-600', 'dark:to-slate-900');
 		bgContainer.classList.add("bg-transparent");
+		if (navBar) navBar.style.display = 'none';
+		isInAR.value = true;
+	});
+	renderer.xr.addEventListener('sessionend', () => {
+		bgContainer.classList.remove("bg-transparent");
+		bgContainer.classList.add('bg-gradient-to-t', 'from-blue-100', 'via-blue-100',
+			'to-blue-200', 'dark:from-slate-900', 'dark:via-slate-600', 'dark:to-slate-900');
+		if (navBar) navBar.style.display = '';
+		isInAR.value = false;
 	});
 	controls = Controls(camera, renderer);
 	controls.update();
@@ -330,7 +341,7 @@ const turnClipping = () => {
 						</div>
 					</template>
 				</ARTools>
-				<LoadIfcButton :loadFunction="loadIfcFile" />
+				<LoadIfcButton v-show="!isInAR" :loadFunction="loadIfcFile" />
 				<IfcClassAR @ifcClass="highLightType" @on-off="visibilizeTypes" @turnOpacity="makeTypesTransparent"
 					:ifc-classes="ifcClasses" v-if="isTypeOpen" />
 				<div v-if="isCropOpen" class="w-1/5 h-3/4 fixed left-14 top-24 bg-transparent">
